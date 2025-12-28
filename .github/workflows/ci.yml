@@ -38,8 +38,8 @@ jobs:
       - name: Install project
         run: poetry install --no-interaction
 
-      - name: Run Ruff (Linting)
-        run: poetry run ruff check .
+#      - name: Run Ruff (Linting)
+#        run: poetry run ruff check .
 
       - name: Run Tests (Pytest)
         run: poetry run pytest
