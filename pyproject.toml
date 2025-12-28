@@ -1,9 +1,9 @@
 [project]
 name = "saltshaker"
 version = "0.1.0"
-description = ""
+description = "A python package for planning astronomical observations with the South African Large Telescope."
 authors = [
-    {name = "Enzo Afonso",email = "135137959+enzoperesafonso@users.noreply.github.com"}
+    {name = "Enzo Peres Afonso",email = "enzo.p.afonso@gmail.com"}
 ]
 readme = "README.md"
 requires-python = ">=3.12"
