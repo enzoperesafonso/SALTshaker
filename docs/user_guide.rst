@@ -1,12 +1,12 @@
 Detailed User Guide
-=================
+===================
 
-This guide provides a comprehensive breakdown of every component in the ``saltshaker`` package and how they work together to plan SALT observations.
+This guide provides a comprehensive breakdown of every component in the ``saltishaker`` package and how they work together to plan SALT observations.
 
 Core Concepts: The Model
 ------------------------
 
-At the heart of ``saltshaker`` is the **Tracking Model**. Because SALT's fixed-altitude geometry is complex, the package uses empirical data to provide fast, accurate calculations.
+At the heart of ``saltishaker`` is the **Tracking Model**. Because SALT's fixed-altitude geometry is complex, the package uses empirical data to provide fast, accurate calculations.
 
 SaltTrackingModel (The Singleton)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -27,7 +27,7 @@ The ``SaltObserver`` class is your primary entry point for Object-Oriented plann
 Planning Functions: The Functional API
 --------------------------------------
 
-For users who prefer a functional style or are building automated scripts, ``saltshaker`` provides high-level functions that don't require managing an observer object.
+For users who prefer a functional style or are building automated scripts, ``saltishaker`` provides high-level functions that don't require managing an observer object.
 
 Visibility Windows
 ~~~~~~~~~~~~~~~~~~
@@ -53,7 +53,7 @@ Rapid Screening
 Scheduling: astroplan Constraints
 ---------------------------------
 
-``saltshaker`` provides two custom constraints that plug directly into the ``astroplan`` scheduling system.
+``saltishaker`` provides two custom constraints that plug directly into the ``astroplan`` scheduling system.
 
 SaltTrackLengthConstraint
 ~~~~~~~~~~~~~~~~~~~~~~~~~

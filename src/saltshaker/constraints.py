@@ -74,6 +74,7 @@ class SaltMoonConstraint(Constraint):
     Constraint on Moon phase and position.
     
     This constraint is satisfied if:
+
     1. The Moon's illuminated fraction is less than or equal to 
        `max_illumination`.
     2. OR, the Moon is currently below the horizon.

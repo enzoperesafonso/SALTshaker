@@ -1,7 +1,7 @@
 Basic Examples
 ==============
 
-This page provides simple, direct code snippets for common tasks using ``saltshaker``. These examples focus on the API functionality without complex plotting or scientific justification.
+This page provides simple, direct code snippets for common tasks using ``saltishaker``. These examples focus on the API functionality without complex plotting or scientific justification.
 
 Checking if a Target is Ever Observable
 ---------------------------------------

@@ -18,7 +18,7 @@ Once a target enters the annulus, the primary mirror remains stationary. Instead
 Because the focal plane is curved and the tracker has a limited physical range of motion, a target can only be tracked for a limited amount of time. This is called the **Track Length**.
 
 Track Length Characteristics
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The track length depends entirely on the target's **declination** and its current **hour angle** (how far it is from the meridian):
 
@@ -34,9 +34,9 @@ When tracking a target, one of three scenarios will happen depending on its decl
 2. **One Continuous Track (Grazing):** The target has a declination that causes it to just graze the top edge of the annulus. It never enters the zenith hole, allowing one very long, continuous track.
 3. **No Tracks:** The target's declination is too far North or too far South. It never enters the annulus.
 
-This is why `saltshaker` calculations explicitly look for and differentiate between **East Tracks** and **West Tracks**.
+This is why `saltishaker` calculations explicitly look for and differentiate between **East Tracks** and **West Tracks**.
 
 Calculating Visibility
 ----------------------
 
-Because the geometry is complex, calculating analytical track lengths is computationally expensive. `saltshaker` solves this by using the ``SaltTrackingModel``, which loads pre-computed empirical tracking data and performs fast linear interpolation to determine exactly when tracks begin and end, and exactly how many seconds of tracking are available at any given second.
+Because the geometry is complex, calculating analytical track lengths is computationally expensive. `saltishaker` solves this by using the ``SaltTrackingModel``, which loads pre-computed empirical tracking data and performs fast linear interpolation to determine exactly when tracks begin and end, and exactly how many seconds of tracking are available at any given second.

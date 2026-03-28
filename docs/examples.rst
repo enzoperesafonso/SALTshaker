@@ -99,7 +99,7 @@ Use this plot to visualize when your target is observable relative to **astronom
 Scheduling: Moon and Track Length Constraints
 ---------------------------------------------
 
-Proposals often require specific "Lunar Class" (Dark, Gray, or Bright). Using ``saltshaker`` with ``astroplan`` allows you to precisely calculate when your target meets both SALT's tracking requirements and your project's lunar constraints.
+Proposals often require specific "Lunar Class" (Dark, Gray, or Bright). Using ``saltishaker`` with ``astroplan`` allows you to precisely calculate when your target meets both SALT's tracking requirements and your project's lunar constraints.
 
 .. plot::
 

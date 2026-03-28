@@ -1,10 +1,10 @@
-saltshaker: Observation Planning for SALT
-=========================================
+saltishaker: Observation Planning for SALT
+==========================================
 
 .. image:: _static/salt_shaker_logo.png
    :align: center
    :width: 400px
-   :alt: SALTshaker Logo
+   :alt: SALTishaker Logo
 
 .. image:: https://img.shields.io/badge/python-3.12+-blue.svg
    :target: https://www.python.org/downloads/
@@ -14,12 +14,12 @@ saltshaker: Observation Planning for SALT
    :target: https://www.astropy.org/
    :alt: Powered by Astropy
 
-Welcome to the documentation for **saltshaker**, a specialized Python package for planning astronomical observations with the Southern African Large Telescope (SALT).
+Welcome to the documentation for **saltishaker**, a specialized Python package for planning astronomical observations with the Southern African Large Telescope (SALT).
 
-Because SALT operates with a unique fixed-altitude design (permanently pointing 37 degrees from the zenith), planning observations requires calculating complex visibility tracks based on Earth's rotation and a physical payload tracker. ``saltshaker`` handles these calculations for you, seamlessly integrating with the broader ``astroplan`` ecosystem.
+Because SALT operates with a unique fixed-altitude design (permanently pointing 37 degrees from the zenith), planning observations requires calculating complex visibility tracks based on Earth's rotation and a physical payload tracker. ``saltishaker`` handles these calculations for you, seamlessly integrating with the broader ``astroplan`` ecosystem.
 
-What can saltshaker do?
------------------------
+What can saltishaker do?
+------------------------
 
 * **Visibility Windows:** Calculate exactly when (UTC) a specific star or galaxy will drift into SALT's field of view.
 * **Track Lengths:** Determine how long SALT can track a target before it hits the edge of its operational limits.

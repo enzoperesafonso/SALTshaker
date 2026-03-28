@@ -4,7 +4,7 @@ sys.path.insert(0, os.path.abspath('../src'))
 
 # -- Project information -----------------------------------------------------
 
-project = 'saltshaker'
+project = 'saltishaker'
 copyright = '2026, Enzo Peres Afonso'
 author = 'Enzo Peres Afonso'
 release = '0.1.0'
@@ -30,7 +30,6 @@ html_static_path = ['_static']
 html_logo = "_static/logomark.png"
 html_theme_options = {
     'logo_only': True,
-    'display_version': False,
 }
 
 # -- Extension configuration -------------------------------------------------

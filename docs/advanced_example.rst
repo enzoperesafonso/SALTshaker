@@ -1,7 +1,7 @@
 Advanced: Full Semester Survey Simulation
 =========================================
 
-This example demonstrates the full power of ``saltshaker`` by simulating a **6-month observing survey**. 
+This example demonstrates the full power of ``saltishaker`` by simulating a **6-month observing survey**. 
 
 Imagine you are proposing a survey of **50 potential supernova hosts**. You need to calculate not just if they are visible, but how many *high-quality* spectroscopic hours you can realistically expect for each target over the entire Semester 2026-1, accounting for:
 

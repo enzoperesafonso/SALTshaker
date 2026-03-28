@@ -1,12 +1,12 @@
-# SALTshaker
+# SALTishaker
 
 <p align="center">
-  <img src="salt_shaker_logo.png" width="500" alt="SALTshaker Logo">
+  <img src="salt_shaker_logo.png" width="500" alt="SALTishaker Logo">
 </p>
 
-**SALTshaker** is a specialized Python package designed for planning astronomical observations with the **Southern African Large Telescope (SALT)**.
+**SALTishaker** is a specialized Python package designed for planning astronomical observations with the **Southern African Large Telescope (SALT)**.
 
-Because SALT operates with a unique fixed-altitude design (pointing permanently at 37 degrees from the zenith), planning observations requires calculating complex visibility tracks based on Earth's rotation and a physical payload tracker. `saltshaker` handles these calculations for you, providing high-performance visibility windows, track lengths, and integration with the broader `astroplan` ecosystem.
+Because SALT operates with a unique fixed-altitude design (pointing permanently at 37 degrees from the zenith), planning observations requires calculating complex visibility tracks based on Earth's rotation and a physical payload tracker. `saltishaker` handles these calculations for you, providing high-performance visibility windows, track lengths, and integration with the broader `astroplan` ecosystem.
 
 ## Key Features
 
@@ -19,7 +19,7 @@ Because SALT operates with a unique fixed-altitude design (pointing permanently 
 ## Installation
 
 ```bash
-pip install saltshaker
+pip install saltishaker
 ```
 
 For development installation:

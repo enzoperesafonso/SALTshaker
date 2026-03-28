@@ -14,13 +14,13 @@ Requirements
 * ``matplotlib`` (>=3.10.8)
 
 Standard Installation
--------------------
+---------------------
 
-You can install ``saltshaker`` via ``pip`` (once published to PyPI):
+You can install ``saltishaker`` via ``pip`` (once published to PyPI):
 
 .. code-block:: bash
 
-    pip install saltshaker
+    pip install saltishaker
 
 Alternatively, you can install directly from the GitHub repository:
 
@@ -31,7 +31,7 @@ Alternatively, you can install directly from the GitHub repository:
 Development Installation
 ------------------------
 
-If you want to contribute to ``saltshaker`` or modify the source code, we recommend using `Poetry <https://python-poetry.org/>`_ to manage your environment.
+If you want to contribute to ``saltishaker`` or modify the source code, we recommend using `Poetry <https://python-poetry.org/>`_ to manage your environment.
 
 1. Clone the repository:
 
