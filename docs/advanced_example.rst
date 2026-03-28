@@ -1,22 +1,26 @@
-Advanced: Full Semester Survey Simulation
-=========================================
+Advanced Example: Semester-level Planning
+=======================================
 
-This example demonstrates the full power of ``saltishaker`` by simulating a **6-month observing survey**. 
+This example demonstrates how ``saltishaker`` can be used to help plan and prioritize observations across an entire **6-month observing semester**. 
 
 .. important::
-   This simulation provides a high-fidelity estimate of survey feasibility. However, these results should be used for **pre-planning and strategy optimization only**. Final visibility windows and proposal submissions must be confirmed using the official **SALT PIPT**.
+   This example is provided for **pre-planning and strategy optimization only**. While it uses high-fidelity models, all visibility windows, track lengths, and final proposal details **must** be confirmed using the official **SALT Phase I Proposal Tool (PIPT)**. These results should be used as a guide to help you select and prioritize targets before performing final validation in the PIPT.
 
-Imagine you are proposing a survey of **50 potential supernova hosts**.
- You need to calculate not just if they are visible, but how many *high-quality* spectroscopic hours you can realistically expect for each target over the entire Semester 2026-1, accounting for:
+Target Prioritization and Feasibility
+-------------------------------------
 
-1.  **Astronomical Dark Time:** Observations must happen between evening and morning twilight.
-2.  **Tracking Feasibility:** Each observation requires a minimum of **30 minutes** of continuous tracking to get a good SNR spectrum.
-3.  **Lunar Constraints:** This is a 'Gray' time program, so targets are only observable if the Moon is < 50% illuminated OR below the horizon.
+When preparing a proposal for a multi-target project (such as a survey of transient hosts), it is helpful to understand the relative availability of your targets. This allows you to prioritize which objects to include in your final PIPT submission.
 
-The Simulation Code
--------------------
+In this example, we evaluate a list of targets against several constraints:
 
-This script iterates through every single night of the semester and performs a high-resolution check for every target.
+1.  **Astronomical Dark Time:** Preliminary check between evening and morning twilight.
+2.  **Tracking Requirements:** Requiring a minimum of **30 minutes** of continuous tracking for each observation window.
+3.  **Lunar Constraints:** Filtering for 'Gray' time requirements (Moon < 50% illuminated OR below the horizon).
+
+Example Planning Script
+-----------------------
+
+This script iterates through the nights of a semester to provide a rough estimate of the total available observing time for each target.
 
 .. code-block:: python
 
@@ -33,13 +37,13 @@ This script iterates through every single night of the semester and performs a h
         SaltMoonConstraint
     )
 
-    # 1. Setup the Survey Parameters
+    # 1. Setup the Planning Parameters
     observer = get_salt_observer()
     year, semester = 2026, 1
     min_track = 30 * u.minute
     max_moon = 0.5
 
-    # 2. Define our target catalog (subset of host galaxies)
+    # 2. Define a preliminary target list
     catalog = {
         'NGC 1365': SkyCoord.from_name('NGC 1365'),
         'M83': SkyCoord.from_name('M83'),
@@ -48,15 +52,15 @@ This script iterates through every single night of the semester and performs a h
         'M104': SkyCoord.from_name('M104')
     }
 
-    # 3. Define the SALT-specific constraints
+    # 3. Define SALT-specific constraints for pre-planning
     constraints = [
         SaltTrackLengthConstraint(min_track_length=min_track),
         SaltMoonConstraint(max_illumination=max_moon)
     ]
 
-    # 4. Get every night in the semester
+    # 4. Iterate through the semester
     nights = get_semester_nights(year, semester)
-    print(f"Simulating {len(catalog)} targets over {len(nights)} nights...")
+    print(f"Evaluating {len(catalog)} targets over {len(nights)} nights...")
 
     results = []
 
@@ -66,55 +70,52 @@ This script iterates through every single night of the semester and performs a h
         nights_visible = 0
         
         for evening_twi, morning_twi in nights:
-            # Create a 15-minute resolution grid for the night
-            # This is more efficient than a 1-minute grid but still accurate
+            # Use a 15-minute resolution for preliminary estimates
             num_steps = int((morning_twi - evening_twi).to(u.min).value / 15)
             times = evening_twi + np.linspace(0, (morning_twi - evening_twi).to(u.hour).value, num_steps) * u.hour
             
-            # Check all constraints simultaneously
-            # (Track length, Moon, and Dark time are all handled here)
+            # Check constraints
             obs_mask = is_event_observable(constraints, observer, target, times=times)[0]
             
             if any(obs_mask):
                 nights_visible += 1
-                # Each 'True' in the mask represents 15 minutes of valid time
                 total_observable_minutes += sum(obs_mask) * 15
 
         results.append({
             'Target': name,
             'Nights Available': nights_visible,
-            'Total Qual. Hours': round(total_observable_minutes / 60, 1),
-            'Avg Min/Night': round(total_observable_minutes / nights_visible, 1) if nights_visible > 0 else 0
+            'Est. Total Hours': round(total_observable_minutes / 60, 1),
+            'Est. Avg Min/Night': round(total_observable_minutes / nights_visible, 1) if nights_visible > 0 else 0
         })
 
-    # 5. Summarize the Survey Feasibility
+    # 5. Review the results
     df = pd.DataFrame(results)
-    print("\n--- Semester 2026-1 Survey Simulation Report ---")
+    print("\n--- Preliminary Semester 2026-1 Planning Report ---")
     print(df.to_string(index=False))
 
-Analyzing the Output
---------------------
+Understanding the Report
+------------------------
 
-When you run this simulation, you get a high-fidelity report that can be directly included in your proposal:
+The output of this script provides a baseline to help guide your observing strategy:
 
-**Simulated Output:**
+**Example Output:**
 
 .. code-block:: text
 
-    Simulating 5 targets over 214 nights...
+    Evaluating 5 targets over 214 nights...
 
-    --- Semester 2026-1 Survey Simulation Report ---
-         Target  Nights Available  Total Qual. Hours  Avg Min/Night
-       NGC 1365                42               48.0           68.6
-            M83               138              162.5           70.7
-    Centaurus A               145              178.0           73.7
-        NGC 253                38               42.5           67.1
-           M104               122              145.0           71.3
+    --- Preliminary Semester 2026-1 Planning Report ---
+         Target  Nights Available  Est. Total Hours  Est. Avg Min/Night
+       NGC 1365                42               48.0                68.6
+            M83               138              162.5                70.7
+    Centaurus A               145              178.0                73.7
+        NGC 253                38               42.5                67.1
+           M104               122              145.0                71.3
 
-Why this is powerful
---------------------
+Strategic Benefits
+------------------
 
-*   **Multivariate Analysis:** This doesn't just check "is the star up?". It checks if the star is up, **AND** the sun is down, **AND** the moon is faint, **AND** the telescope tracker has enough room to finish the job.
-*   **TAC Justification:** Instead of saying "these targets are visible in winter," you can say "Target Centaurus A provides 178 hours of high-quality Gray time, averaging 73.7 minutes of track per night."
-*   **Survey Optimization:** You can see that NGC 253 is only available for 38 nights in this semester. This helps you prioritize it early in the season or move it to a different proposal.
-*   **Comprehensive Planning:** This script enables high-fidelity survey simulations that account for multiple physical and operational variables simultaneously, providing a robust baseline for complex proposals.
+*   **Multivariate Preliminary Check:** This approach accounts for the interaction between dark time, lunar phase, and SALT's physical tracking annulus simultaneously.
+*   **Strategy Guidance:** The report helps identify which targets have limited availability (e.g., NGC 253 in this example), allowing you to focus on them when they are best placed.
+*   **Time Request Justification:** These estimates provide a quantitative basis for the time requests you will ultimately define and validate in the official SALT PIPT.
+*   **Comprehensive Screening:** This example allows you to screen multiple targets across a broad timeframe, identifying the most promising candidates for your project before performing the mandatory final checks in the official tools.

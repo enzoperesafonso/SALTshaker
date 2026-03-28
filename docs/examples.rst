@@ -1,23 +1,23 @@
 Proposer's Cookbook: Planning for SALT
 ========================================
 
-This page provides detailed recipes for using ``saltishaker`` to prepare and optimize observing strategies for the Southern African Large Telescope (SALT). 
+This page provides practical examples for using ``saltishaker`` to prepare and optimize observing strategies for the Southern African Large Telescope (SALT). 
 
 .. important::
-   **Disclaimer:** ``saltishaker`` is an independent planning tool and is **not** an official SALT product. While it is designed to provide high-fidelity visibility calculations, all final observing proposals **must** be validated and submitted using the official **SALT Phase I Proposal Tool (PIPT)**. 
+   **Essential Usage Information:** ``saltishaker`` is an independent pre-planning tool and is **not** an official SALT product. While it provides high-fidelity models, all final observing proposals **must** be validated and submitted using the official **SALT Phase I Proposal Tool (PIPT)**. 
 
-   Use ``saltishaker`` to screen targets, optimize your survey strategy, and generate preliminary plots for your Technical Justification, but always perform a final check in the PIPT before submission.
+   Use these examples to screen targets, optimize your strategy, and generate preliminary plots for your Technical Justification, but always perform a final check in the PIPT before submission.
 
 .. contents:: Table of Contents
    :local:
    :depth: 2
 
-Pre-Feasibility: Determining Track Lengths
-------------------------------------------
+Preliminary Feasibility: Estimating Track Lengths
+-------------------------------------------------
 
-The most fundamental constraint at SALT is the tracker's physical range. For any exposure, you should ensure the telescope can follow the target for the required duration. 
+The most fundamental constraint at SALT is the tracker's physical range. For any exposure, you should verify that the telescope can follow the target for the required duration. 
 
-The following plot is useful for your preliminary Technical Justification to show the available "window of opportunity" for your intended exposures.
+The following plot can help you estimate the available "window of opportunity" for your intended exposures during the proposal phase.
 
 .. plot::
 
@@ -41,22 +41,22 @@ The following plot is useful for your preliminary Technical Justification to sho
     plt.fill_between(times.plot_date, track_lengths, color='red', alpha=0.1)
     plt.plot(times.plot_date, track_lengths, color='red', lw=2)
     
-    # Add a reference line for a typical 30-minute exposure
-    plt.axhline(1800, color='black', linestyle='--', label='30 min Exposure')
+    # Reference line for an intended 30-minute exposure
+    plt.axhline(1800, color='black', linestyle='--', label='Intended 30 min Exposure')
 
-    plt.title(f"Available Tracking Time for {target.name}")
+    plt.title(f"Estimated Tracking Time for {target.name}")
     plt.ylabel("Available Track Length (seconds)")
     plt.xlabel("Time (UTC)")
     plt.legend()
     plt.grid(True, alpha=0.3)
     plt.show()
 
-Nightly Planning: Visualizing Tracks
-------------------------------------
+Nightly Planning: Visualizing Preliminary Tracks
+------------------------------------------------
 
-Because SALT is a fixed-altitude telescope, targets pass through the visibility zone twice on many nights (the East and West tracks), separated by a "Zenith Hole." 
+Because SALT is a fixed-altitude telescope, targets often pass through the visibility zone twice (the East and West tracks), separated by a "Zenith Hole." 
 
-Use this plot to visualize when your target is observable relative to **astronomical twilight** (-18°).
+This visualization helps you understand when your target is observable relative to **astronomical twilight** (-18°).
 
 .. plot::
 
@@ -71,7 +71,7 @@ Use this plot to visualize when your target is observable relative to **astronom
     target = SkyCoord.from_name('Sirius')
     date = '2026-01-15'
 
-    # 1. Calculate the tracks and twilight
+    # 1. Calculate the estimated tracks and twilight
     windows = get_visibility_windows(target, date)
     start_time = Time(f"{date} 12:00:00")
     eve_twi = observer.twilight_evening_astronomical(start_time, which='next')
@@ -83,15 +83,15 @@ Use this plot to visualize when your target is observable relative to **astronom
     # Shade the dark time
     ax.axvspan(eve_twi.plot_date, morn_twi.plot_date, color='black', alpha=0.15, label='Astronomical Dark')
 
-    # Shade the visibility windows
+    # Shade the estimated visibility windows
     for i, w in enumerate(windows):
         ax.axvspan(w.start_time.plot_date, w.end_time.plot_date, color='green', alpha=0.6, 
-                   label='SALT Visibility' if i==0 else "")
+                   label='Est. SALT Visibility' if i==0 else "")
         # Label the tracks
         mid_time = w.start_time.plot_date + (w.end_time.plot_date - w.start_time.plot_date)/2
         ax.text(mid_time, 0.5, f"Track {i+1}", ha='center', va='center', fontweight='bold')
 
-    plt.title(f"Nightly Observation Windows: {target.name} on {date}")
+    plt.title(f"Preliminary Nightly Windows: {target.name} on {date}")
     ax.xaxis.set_major_formatter(DateFormatter('%H:%M'))
     ax.set_yticks([])
     plt.xlabel("Time (UTC)")
@@ -99,10 +99,10 @@ Use this plot to visualize when your target is observable relative to **astronom
     plt.grid(True, axis='x', alpha=0.3)
     plt.show()
 
-Scheduling: Moon and Track Length Constraints
+Preliminary Scheduling: Moon and Track Length
 ---------------------------------------------
 
-Proposals often require specific "Lunar Class" (Dark, Gray, or Bright). Using ``saltishaker`` with ``astroplan`` allows you to precisely calculate when your target meets both SALT's tracking requirements and your project's lunar constraints.
+Using ``saltishaker`` with ``astroplan`` allows you to estimate when your target meets both SALT's tracking requirements and your project's preliminary lunar constraints.
 
 .. plot::
 
@@ -121,8 +121,8 @@ Proposals often require specific "Lunar Class" (Dark, Gray, or Bright). Using ``
     observer = get_salt_observer()
     target = FixedTarget(coord=SkyCoord.from_name('Sirius'), name='Sirius')
     
-    # Define constraints for a 'Gray' time proposal:
-    # 1. Must have at least 20 minutes of track length
+    # Define constraints for a Gray time proposal:
+    # 1. Estimate at least 20 minutes of track length
     # 2. Moon must be less than 50% illuminated (or below the horizon)
     constraints = [
         SaltTrackLengthConstraint(min_track_length=20 * u.minute),
@@ -135,15 +135,15 @@ Proposals often require specific "Lunar Class" (Dark, Gray, or Bright). Using ``
 
     plt.figure(figsize=(10, 2))
     plt.fill_between(times.plot_date, 0, 1, where=observable, color='blue', alpha=0.3)
-    plt.title(f"Observability with Gray Moon & >20m Track: {target.name}")
+    plt.title(f"Est. Observability (Gray Moon & >20m Track): {target.name}")
     plt.xlabel("Time (UTC)")
     plt.yticks([])
     plt.show()
 
-Long-term Planning: Annual Visibility
--------------------------------------
+Long-term Planning: Annual Visibility Cycles
+--------------------------------------------
 
-For any multi-month proposal, you need to show when your target is best placed during the semester. The "Annual Plot" shows how the visibility windows drift across the night as the year progresses.
+The "Annual Plot" provides a rough guide for when your target is best placed during the semester. 
 
 .. plot::
 
@@ -173,21 +173,21 @@ For any multi-month proposal, you need to show when your target is best placed d
             
             # Plot Dark Time
             plt.plot([to_h(eve), to_h(morn)], [date.datetime, date.datetime], color='gray', alpha=0.2, lw=4)
-            # Plot SALT Tracks
+            # Plot Est. SALT Tracks
             for w in windows:
                 plt.plot([to_h(w.start_time), to_h(w.end_time)], [date.datetime, date.datetime], color='green', lw=4)
         except: continue
 
     plt.gca().invert_yaxis()
-    plt.title(f"Annual Visibility Cycle: {target.name}")
+    plt.title(f"Annual Cycle (Preliminary): {target.name}")
     plt.xlabel("Hours from Noon UTC")
     plt.grid(True, alpha=0.2)
     plt.show()
 
-Semester Statistics: Justifying Time Requests
----------------------------------------------
+Semester Statistics: Guiding Time Requests
+------------------------------------------
 
-A thorough proposal includes statistics on the total number of observable hours in a semester. This helps the TAC (Time Allocation Committee) understand if your project is realistic.
+Calculating preliminary statistics on observable hours helps you determine if your project is realistic for a given semester.
 
 .. code-block:: python
 
@@ -206,7 +206,7 @@ A thorough proposal includes statistics on the total number of observable hours 
         windows = get_visibility_windows(target, eve)
         night_sec = 0
         for w in windows:
-            # Calculate overlap of the SALT track with dark time
+            # Estimate overlap of the SALT track with dark time
             start = max(w.start_time, eve)
             end = min(w.end_time, morn)
             if start < end:
@@ -216,15 +216,15 @@ A thorough proposal includes statistics on the total number of observable hours 
             total_sec += night_sec
             observable_nights += 1
 
-    print(f"Proposal Statistics for {target.name} (Semester {year}-{semester}):")
-    print(f"  - Total Observable Hours: {total_sec / 3600:.1f} hours")
+    print(f"Preliminary Statistics for {target.name} (Semester {year}-{semester}):")
+    print(f"  - Estimated Total Observable Hours: {total_sec / 3600:.1f} hours")
     print(f"  - Number of Observable Nights: {observable_nights}")
-    print(f"  - Average Track per Night: {(total_sec/observable_nights)/60:.1f} minutes")
+    print(f"  - Estimated Average Track per Night: {(total_sec/observable_nights)/60:.1f} minutes")
 
-Batch Screening: Catalog Feasibility
-------------------------------------
+Catalog Screening: Preliminary Catalog Feasibility
+--------------------------------------------------
 
-If your proposal involves a large catalog of targets, you can quickly screen them to find which are best suited for SALT.
+If your project involves a large catalog of targets, you can use these functions to quickly screen for objects that fall within SALT'sreachable range.
 
 .. code-block:: python
 
@@ -232,7 +232,7 @@ If your proposal involves a large catalog of targets, you can quickly screen the
     from astropy.coordinates import SkyCoord
     from saltshaker import is_target_observable
 
-    # Load your target catalog
+    # Preliminary target catalog
     catalog = [
         ('M31', '00h42m44s', '+41d16m09s'),
         ('M42', '05h35m17s', '-05d23m28s'),
@@ -243,9 +243,9 @@ If your proposal involves a large catalog of targets, you can quickly screen the
     results = []
     for name, ra, dec in catalog:
         coord = SkyCoord(ra, dec, frame='icrs')
-        # is_target_observable checks if it EVER enters the SALT annulus
+        # is_target_observable provides a quick preliminary check
         observable = is_target_observable(coord)
-        results.append({'Target': name, 'Dec': dec, 'SALT Observable': observable})
+        results.append({'Target': name, 'Dec': dec, 'Est. SALT Observable': observable})
 
     df = pd.DataFrame(results)
     print(df.to_string(index=False))
