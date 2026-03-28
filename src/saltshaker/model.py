@@ -69,6 +69,9 @@ class SaltTrackingModel:
             mask = data[:, 0] == dec
             dec_data = data[mask]
             
+            # Use scalar float for dictionary keys to avoid unhashable type error
+            dec_key = float(dec)
+            
             if -62.75 <= dec < -1.75:
                 east_mask = dec_data[:, 1] <= 0
                 west_mask = dec_data[:, 1] > 0
@@ -78,11 +81,11 @@ class SaltTrackingModel:
                 w_ha = dec_data[west_mask, 1]
                 w_tl = dec_data[west_mask, 2]
                 
-                self.east_data[dec] = self._finalize_track_arrays(e_ha, e_tl)
-                self.west_data[dec] = self._finalize_track_arrays(w_ha, w_tl)
+                self.east_data[dec_key] = self._finalize_track_arrays(e_ha, e_tl)
+                self.west_data[dec_key] = self._finalize_track_arrays(w_ha, w_tl)
             else:
-                self.east_data[dec] = self._finalize_track_arrays(dec_data[:, 1], dec_data[:, 2])
-                self.west_data[dec] = (np.array([]), np.array([]))
+                self.east_data[dec_key] = self._finalize_track_arrays(dec_data[:, 1], dec_data[:, 2])
+                self.west_data[dec_key] = (np.array([]), np.array([]))
 
     def _finalize_track_arrays(self, ha, tl):
         """Helper to add the end-of-track point to NumPy arrays."""
@@ -97,8 +100,10 @@ class SaltTrackingModel:
 
     def _get_track_limits(self, dec):
         """Internal helper to get ha_start and ha_end for both tracks at a specific dec."""
-        e_ha, _ = self.east_data[dec]
-        w_ha, _ = self.west_data[dec]
+        # Ensure dec is a hashable scalar
+        dec_key = float(dec)
+        e_ha, _ = self.east_data[dec_key]
+        w_ha, _ = self.west_data[dec_key]
         
         e_limits = (e_ha[0], e_ha[-1]) if len(e_ha) > 0 else (None, None)
         w_limits = (w_ha[0], w_ha[-1]) if len(w_ha) > 0 else (None, None)
@@ -178,8 +183,10 @@ class SaltTrackingModel:
         dec1, dec2 = self.declinations[idx-1], self.declinations[idx]
         
         def get_tl_at_dec(d, ha_in):
-            e_ha, e_tl = self.east_data[d]
-            w_ha, w_tl = self.west_data[d]
+            # Ensure d is a hashable scalar
+            d_key = float(d)
+            e_ha, e_tl = self.east_data[d_key]
+            w_ha, w_tl = self.west_data[d_key]
             
             # This handles both scalars and arrays
             res = np.zeros_like(ha_in, dtype=float)
@@ -228,8 +235,8 @@ class SaltTrackingModel:
         if idx == len(self.declinations): idx = len(self.declinations) - 1
         
         d1, d2 = self.declinations[idx-1], self.declinations[idx]
-        ha_peaks = np.concatenate([self.east_data[d1][0], self.west_data[d1][0],
-                                   self.east_data[d2][0], self.west_data[d2][0]])
+        ha_peaks = np.concatenate([self.east_data[float(d1)][0], self.west_data[float(d1)][0],
+                                   self.east_data[float(d2)][0], self.west_data[float(d2)][0]])
         
         if len(ha_peaks) == 0: return 0.0
         
