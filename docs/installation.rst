@@ -26,7 +26,7 @@ Alternatively, you can install directly from the GitHub repository:
 
 .. code-block:: bash
 
-    pip install git+https://github.com/enzo-peres-afonso/SALTshaker.git
+    pip install git+https://github.com/enzo-peres-afonso/saltishaker.git
 
 Development Installation
 ------------------------
@@ -37,8 +37,8 @@ If you want to contribute to ``saltishaker`` or modify the source code, we recom
 
    .. code-block:: bash
 
-       git clone https://github.com/enzo-peres-afonso/SALTshaker.git
-       cd SALTshaker
+       git clone https://github.com/enzo-peres-afonso/saltishaker.git
+       cd saltishaker
 
 2. Install dependencies (including development tools like ``pytest``, ``ruff``, and ``sphinx``):
 

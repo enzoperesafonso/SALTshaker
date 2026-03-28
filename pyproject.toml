@@ -35,9 +35,9 @@ docs = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/enzoperesafonso/SALTshaker"
-Repository = "https://github.com/enzoperesafonso/SALTshaker"
-Documentation = "https://github.com/enzoperesafonso/SALTshaker#documentation"
+Homepage = "https://saltishaker.readthedocs.io/"
+Repository = "https://github.com/enzoperesafonso/saltishaker"
+Documentation = "https://saltishaker.readthedocs.io/"
 
 [tool.poetry]
 packages = [{include = "saltshaker", from = "src"}]

@@ -8,8 +8,8 @@ You can install ``saltshaker`` via pip (once published) or by cloning the reposi
 
 .. code-block:: bash
 
-    git clone https://github.com/enzo-peres-afonso/SALTshaker.git
-    cd SALTshaker
+    git clone https://github.com/enzo-peres-afonso/saltishaker.git
+    cd saltishaker
     poetry install
 
 Basic Concepts

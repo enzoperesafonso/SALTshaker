@@ -25,9 +25,9 @@ pip install saltishaker
 For development installation:
 
 ```bash
-git clone https://github.com/enzo-peres-afonso/SALTshaker.git
-cd SALTshaker
-poetry install
+git clone https://github.com/enzo-peres-afonso/saltishaker.git
+cd saltishaker
+pip install .
 ```
 
 ## Quick Start
@@ -55,7 +55,7 @@ for track in tracks:
 
 Full documentation, including a theoretical background on SALT visibility and a "Proposer's Cookbook" of examples, is available at:
 
-**[Link to your documentation site - e.g., ReadTheDocs or GitHub Pages]**
+**[https://saltishaker.readthedocs.io/](https://saltishaker.readthedocs.io/)**
 
 ## License
 
