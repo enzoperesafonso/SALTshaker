@@ -3,7 +3,11 @@ Advanced: Full Semester Survey Simulation
 
 This example demonstrates the full power of ``saltishaker`` by simulating a **6-month observing survey**. 
 
-Imagine you are proposing a survey of **50 potential supernova hosts**. You need to calculate not just if they are visible, but how many *high-quality* spectroscopic hours you can realistically expect for each target over the entire Semester 2026-1, accounting for:
+.. important::
+   This simulation provides a high-fidelity estimate of survey feasibility. However, these results should be used for **pre-planning and strategy optimization only**. Final visibility windows and proposal submissions must be confirmed using the official **SALT PIPT**.
+
+Imagine you are proposing a survey of **50 potential supernova hosts**.
+ You need to calculate not just if they are visible, but how many *high-quality* spectroscopic hours you can realistically expect for each target over the entire Semester 2026-1, accounting for:
 
 1.  **Astronomical Dark Time:** Observations must happen between evening and morning twilight.
 2.  **Tracking Feasibility:** Each observation requires a minimum of **30 minutes** of continuous tracking to get a good SNR spectrum.

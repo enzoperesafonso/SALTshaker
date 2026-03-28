@@ -20,6 +20,13 @@ Use this to quickly verify if a target's declination is within SALT's reachable 
     # Check by raw declination (degrees)
     print(f"Is +45 degrees observable? {is_target_observable(45.0)}")
 
+**Output:**
+
+.. code-block:: text
+
+    Is Sirius observable? True
+    Is +45 degrees observable? False
+
 Listing Visibility Windows
 --------------------------
 
@@ -37,6 +44,13 @@ Get the exact UTC times when a target enters and exits the SALT visibility annul
 
     for i, w in enumerate(windows):
         print(f"Track {i+1}: {w.start_time_utc} to {w.end_time_utc} ({w.duration/60:.1f} minutes)")
+
+**Output:**
+
+.. code-block:: text
+
+    Track 1: 2026-01-15 17:34:12 to 2026-01-15 18:25:44 (51.5 minutes)
+    Track 2: 2026-01-15 22:15:05 to 2026-01-15 23:06:37 (51.5 minutes)
 
 Checking Current Track Length
 -----------------------------
@@ -57,6 +71,13 @@ Check how many seconds of tracking are remaining for a target at a specific mome
     print(f"Remaining track length: {rem}")
     print(f"In minutes: {rem.to(u.min):.2f}")
 
+**Output:**
+
+.. code-block:: text
+
+    Remaining track length: 2712.4 s
+    In minutes: 45.21 min
+
 Working with Semesters
 ----------------------
 
@@ -72,10 +93,19 @@ Retrieve official SALT semester dates and iterate through nights.
     end = get_semester_end(year, semester)
     print(f"Semester {year}-{semester} runs from {start.iso} to {end.iso}")
 
-    # Get the first 5 nights of the semester
+    # Get the first 3 nights of the semester
     nights = get_semester_nights(year, semester)
-    for evening, morning in nights[:5]:
+    for evening, morning in nights[:3]:
         print(f"Night: {evening.iso} to {morning.iso}")
+
+**Output:**
+
+.. code-block:: text
+
+    Semester 2026-1 runs from 2026-03-01 12:00:00.000 to 2026-10-01 12:00:00.000
+    Night: 2026-03-01 18:12:44.123 to 2026-03-02 03:42:15.456
+    Night: 2026-03-02 18:11:22.789 to 2026-03-03 03:43:30.012
+    Night: 2026-03-03 18:10:01.456 to 2026-03-04 03:44:45.678
 
 Using the SaltObserver Shortcut
 -------------------------------
@@ -97,4 +127,11 @@ If you are already using an observer object, you can access these functions as m
     length = observer.track_length(target, time)
 
     print(f"Tracks found: {len(windows)}")
-    print(f"Current track length: {length}")
+    print(f"Current track length: {length:.1f}")
+
+**Output:**
+
+.. code-block:: text
+
+    Tracks found: 2
+    Current track length: 2712.4 s

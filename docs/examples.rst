@@ -1,20 +1,23 @@
 Proposer's Cookbook: Planning for SALT
 ========================================
 
-This page provides detailed recipes for using ``saltshaker`` to prepare observing proposals for the Southern African Large Telescope (SALT). 
+This page provides detailed recipes for using ``saltishaker`` to prepare and optimize observing strategies for the Southern African Large Telescope (SALT). 
 
-When writing a proposal, you must demonstrate that your targets are observable within the requested semester, that you have sufficient track length for your exposures, and that you have accounted for constraints like Moon brightness.
+.. important::
+   **Disclaimer:** ``saltishaker`` is an independent planning tool and is **not** an official SALT product. While it is designed to provide high-fidelity visibility calculations, all final observing proposals **must** be validated and submitted using the official **SALT Phase I Proposal Tool (PIPT)**. 
+
+   Use ``saltishaker`` to screen targets, optimize your survey strategy, and generate preliminary plots for your Technical Justification, but always perform a final check in the PIPT before submission.
 
 .. contents:: Table of Contents
    :local:
    :depth: 2
 
-Feasibility: Determining Track Lengths
---------------------------------------
+Pre-Feasibility: Determining Track Lengths
+------------------------------------------
 
-The most fundamental constraint at SALT is the tracker's physical range. For any exposure, you must ensure the telescope can follow the target for the required duration. 
+The most fundamental constraint at SALT is the tracker's physical range. For any exposure, you should ensure the telescope can follow the target for the required duration. 
 
-The following plot is useful for your Technical Justification to show the available "window of opportunity" for your longest exposures.
+The following plot is useful for your preliminary Technical Justification to show the available "window of opportunity" for your intended exposures.
 
 .. plot::
 
