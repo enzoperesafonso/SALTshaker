@@ -38,34 +38,36 @@ class SaltTrackLengthConstraint(Constraint):
     def compute_constraint(self, times, observer, targets):
         """
         Evaluates the constraint for a set of times and targets.
-
-        Args:
-            times (Time): The times to evaluate.
-            observer (SaltObserver): The observer instance.
-            targets (list[SkyCoord]): The targets to evaluate.
-
-        Returns:
-            np.ndarray: A boolean array of shape (n_targets, n_times).
+        
+        This implementation is fully vectorized for maximum performance.
         """
         if times.isscalar:
             times_arr = times[None]
         else:
             times_arr = times
             
+        # 1. Calculate LST for all times (Astroplan does this efficiently)
         lst = observer.local_sidereal_time(times_arr)
-        constraint_result = np.ones((len(targets), len(times_arr)), dtype=bool)
+        
+        # 2. Initialize result array (n_targets x n_times)
+        constraint_result = np.zeros((len(targets), len(times_arr)), dtype=bool)
         
         for i, target in enumerate(targets):
             declination = target.dec.to(u.deg).value
             ra = target.ra
             
-            for j, time in enumerate(times_arr):
-                ha = (lst[j] - ra).to(u.hourangle).value
-                if ha > 12: ha -= 24
-                elif ha < -12: ha += 24
-                
-                track_len = self.tracking_model.track_length(declination, ha) * u.second
-                constraint_result[i][j] = track_len >= self.min_track_length
+            # 3. Calculate all hour angles at once (Vectorized)
+            ha = (lst - ra).to(u.hourangle).value
+            
+            # 4. Normalize HAs to [-12, 12] range (Vectorized)
+            ha[ha > 12] -= 24
+            ha[ha < -12] += 24
+            
+            # 5. Get all track lengths at once (Vectorized call to optimized model)
+            track_lens = self.tracking_model.track_length(declination, ha) * u.second
+            
+            # 6. Apply constraint (Vectorized)
+            constraint_result[i] = track_lens >= self.min_track_length
                 
         return constraint_result
 
@@ -95,14 +97,6 @@ class SaltMoonConstraint(Constraint):
     def compute_constraint(self, times, observer, targets):
         """
         Evaluates the constraint for a set of times and targets.
-
-        Args:
-            times (Time): The times to evaluate.
-            observer (SaltObserver): The observer instance.
-            targets (list[SkyCoord]): The targets to evaluate.
-
-        Returns:
-            np.ndarray: A boolean array of shape (n_targets, n_times).
         """
         if times.isscalar:
             times_arr = times[None]
@@ -116,5 +110,9 @@ class SaltMoonConstraint(Constraint):
         moon_altaz = observer.moon_altaz(times_arr)
         moon_down = moon_altaz.alt <= 0 * u.deg
         
+        # The constraint is satisfied if:
+        # (Moon illumination <= max) OR (Moon is below horizon)
         satisfied_global = np.logical_or(illum_ok, moon_down)
+        
+        # Expand to (n_targets x n_times)
         return np.tile(satisfied_global, (len(targets), 1))

@@ -1,6 +1,6 @@
 [project]
 name = "saltishaker"
-version = "0.1.0"
+version = "0.1.1"
 description = "A python package for planning astronomical observations with the South African Large Telescope."
 authors = [
     {name = "Enzo Peres Afonso", email = "enzo.p.afonso@gmail.com"}

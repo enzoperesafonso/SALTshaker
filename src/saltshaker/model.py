@@ -4,14 +4,14 @@ Core tracking model for the Southern African Large Telescope (SALT).
 This module provides the `SaltTrackingModel` class, which encapsulates the 
 unique fixed-altitude tracking geometry of SALT. It handles data loading from 
 empirical visibility files and provides high-performance interpolation for 
-track limits and available track lengths.
+track limits and available track lengths using NumPy.
 
 The model is designed as a singleton to ensure that the underlying data file 
 is only loaded and parsed once per session.
 """
 
 import os
-import math
+import numpy as np
 
 class SaltTrackingModel:
     """
@@ -23,18 +23,13 @@ class SaltTrackingModel:
     target's declination.
 
     Attributes:
-        declinations (list[float]): A sorted list of declinations (degrees) 
+        declinations (np.ndarray): A sorted array of declinations (degrees) 
             available in the empirical data file.
-        east_tracks (list[list[dict]]): A list of data points for the eastern 
-            (rising) tracks, indexed by declination.
-        west_tracks (list[list[dict]]): A list of data points for the western 
-            (setting) tracks, indexed by declination.
         UT_TO_ST_FACTOR (float): The conversion factor from Universal Time 
             to Sidereal Time (approx 1.0027379).
     """
     
     _instance = None
-    # Conversion factor from Universal Time to sidereal time
     UT_TO_ST_FACTOR = 1.00273790935
     
     def __new__(cls):
@@ -53,311 +48,195 @@ class SaltTrackingModel:
         """
         if self._initialized:
             return
-        self.declinations = []
-        self.east_tracks = []
-        self.west_tracks = []
-        self._read_model()
+            
+        self._load_data()
         self._initialized = True
 
-    def _read_model(self):
+    def _load_data(self):
         """
-        Internal method to read and parse the tracking model data file.
-        
-        The file 'visDataOrdered.dat' contains triplets of (declination, 
-        hour angle, track length).
+        Internal method to read and parse the tracking model data file using NumPy.
         """
         data_file = os.path.join(os.path.dirname(__file__), "data", "visDataOrdered.dat")
         
-        current_declination = None
-        east_track_info = []
-        west_track_info = []
+        # Load the data: Dec (0), HA (1), Track Length (2)
+        data = np.loadtxt(data_file, usecols=(0, 1, 2))
         
-        with open(data_file, 'r') as f:
-            for line in f:
-                line = line.strip()
-                if not line or line.startswith('#'):
-                    continue
-                    
-                parts = line.split()
-                if len(parts) < 3:
-                    continue
-                    
-                declination = float(parts[0])
-                hour_angle = float(parts[1])
-                track_length = float(parts[2])
-                
-                if current_declination is None or declination != current_declination:
-                    if current_declination is not None:
-                        self._finalize_tracks(east_track_info, west_track_info)
-                        self.declinations.append(current_declination)
-                        self.east_tracks.append(east_track_info)
-                        self.west_tracks.append(west_track_info)
-                    
-                    current_declination = declination
-                    east_track_info = []
-                    west_track_info = []
-                
-                tl_info = {'hour_angle': hour_angle, 'track_length': track_length}
-                
-                # Logic for splitting East/West tracks
-                if -62.75 <= declination < -1.75 and hour_angle > 0:
-                    west_track_info.append(tl_info)
-                else:
-                    east_track_info.append(tl_info)
-            
-            if current_declination is not None:
-                self._finalize_tracks(east_track_info, west_track_info)
-                self.declinations.append(current_declination)
-                self.east_tracks.append(east_track_info)
-                self.west_tracks.append(west_track_info)
-
-    def _finalize_tracks(self, east_track_info, west_track_info):
-        """
-        Internal helper to add end-of-track markers.
+        self.declinations = np.unique(data[:, 0])
+        self.east_data = {}  # {dec: (ha_array, tl_array)}
+        self.west_data = {}  # {dec: (ha_array, tl_array)}
         
-        Args:
-            east_track_info: List of tracking data for the eastern track.
-            west_track_info: List of tracking data for the western track.
-        """
-        if east_track_info:
-            last_info = east_track_info[-1]
-            end_of_track = last_info['hour_angle'] + self.UT_TO_ST_FACTOR * last_info['track_length'] / 3600.0
-            east_track_info.append({'hour_angle': end_of_track, 'track_length': 0.0})
+        for dec in self.declinations:
+            mask = data[:, 0] == dec
+            dec_data = data[mask]
             
-        if west_track_info:
-            last_info = west_track_info[-1]
-            end_of_track = last_info['hour_angle'] + self.UT_TO_ST_FACTOR * last_info['track_length'] / 3600.0
-            west_track_info.append({'hour_angle': end_of_track, 'track_length': 0.0})
+            if -62.75 <= dec < -1.75:
+                east_mask = dec_data[:, 1] <= 0
+                west_mask = dec_data[:, 1] > 0
+                
+                e_ha = dec_data[east_mask, 1]
+                e_tl = dec_data[east_mask, 2]
+                w_ha = dec_data[west_mask, 1]
+                w_tl = dec_data[west_mask, 2]
+                
+                self.east_data[dec] = self._finalize_track_arrays(e_ha, e_tl)
+                self.west_data[dec] = self._finalize_track_arrays(w_ha, w_tl)
+            else:
+                self.east_data[dec] = self._finalize_track_arrays(dec_data[:, 1], dec_data[:, 2])
+                self.west_data[dec] = (np.array([]), np.array([]))
 
-    def _lower_index_for_value(self, value, values):
-        """
-        Binary search helper to find the lower interpolation index.
-
-        Args:
-            value (float): The value to search for.
-            values (list[float]): The sorted list of reference values.
-
-        Returns:
-            int: The index `i` such that `values[i] <= value`.
-
-        Raises:
-            ValueError: If the value is outside the range of the model.
-        """
-        if value < values[0] or value > values[-1]:
-            raise ValueError(f"The declination {value} lies outside the allowed range from {values[0]} to {values[-1]}")
+    def _finalize_track_arrays(self, ha, tl):
+        """Helper to add the end-of-track point to NumPy arrays."""
+        if len(ha) == 0:
+            return np.array([]), np.array([])
             
-        i = 0
-        while i < len(values) and values[i] <= value:
-            i += 1
-        i -= 1
-        if i == len(values) - 1:
-            i -= 1
-        return i
+        end_ha = ha[-1] + self.UT_TO_ST_FACTOR * tl[-1] / 3600.0
+        ha_final = np.concatenate([ha, [end_ha]])
+        tl_final = np.concatenate([tl, [0.0]])
+        
+        return ha_final, tl_final
+
+    def _get_track_limits(self, dec):
+        """Internal helper to get ha_start and ha_end for both tracks at a specific dec."""
+        e_ha, _ = self.east_data[dec]
+        w_ha, _ = self.west_data[dec]
+        
+        e_limits = (e_ha[0], e_ha[-1]) if len(e_ha) > 0 else (None, None)
+        w_limits = (w_ha[0], w_ha[-1]) if len(w_ha) > 0 else (None, None)
+        
+        return e_limits, w_limits
 
     def get_east_track(self, declination):
-        """
-        Calculates the start and end hour angles for the eastern (rising) track.
-        
-        This method performs linear interpolation between the pre-computed 
-        declination points in the tracking model.
-
-        Args:
-            declination (float): The target declination in degrees.
+        """Calculates the start and end hour angles for the eastern (rising) track."""
+        if declination < self.declinations[0] or declination > self.declinations[-1]:
+            raise ValueError(f"Declination {declination} out of range.")
             
-        Returns:
-            tuple[float, float]: A tuple of (start_hour_angle, end_hour_angle) 
-                in decimal hours.
-        """
-        lower_index = self._lower_index_for_value(declination, self.declinations)
+        idx = np.searchsorted(self.declinations, declination)
+        if idx == 0: idx = 1
+        if idx == len(self.declinations): idx = len(self.declinations) - 1
+            
+        dec1, dec2 = self.declinations[idx-1], self.declinations[idx]
+        lim1_e, lim1_w = self._get_track_limits(dec1)
+        lim2_e, lim2_w = self._get_track_limits(dec2)
         
-        east_track1 = self.east_tracks[lower_index]
-        east_track2 = self.east_tracks[lower_index + 1]
-        west_track1 = self.west_tracks[lower_index]
-        west_track2 = self.west_tracks[lower_index + 1]
-        
-        declination1 = self.declinations[lower_index]
-        declination2 = self.declinations[lower_index + 1]
-        
-        if west_track1 and west_track2:
-            start1, end1 = east_track1[0]['hour_angle'], east_track1[-1]['hour_angle']
-            start2, end2 = east_track2[0]['hour_angle'], east_track2[-1]['hour_angle']
-        elif not west_track1 and west_track2:
-            start1, end1 = east_track1[0]['hour_angle'], 0
-            start2, end2 = east_track2[0]['hour_angle'], east_track2[-1]['hour_angle']
-        elif west_track1 and not west_track2:
-            start1, end1 = east_track1[0]['hour_angle'], east_track1[-1]['hour_angle']
-            start2, end2 = east_track2[0]['hour_angle'], 0
+        if lim1_w[0] is not None and lim2_w[0] is not None:
+            s1, e1 = lim1_e
+            s2, e2 = lim2_e
+        elif lim1_w[0] is None and lim2_w[0] is not None:
+            s1, e1 = lim1_e[0], 0.0
+            s2, e2 = lim2_e
+        elif lim1_w[0] is not None and lim2_w[0] is None:
+            s1, e1 = lim1_e
+            s2, e2 = lim2_e[0], 0.0
         else:
-            start1, end1 = east_track1[0]['hour_angle'], east_track1[-1]['hour_angle']
-            start2, end2 = east_track2[0]['hour_angle'], east_track2[-1]['hour_angle']
+            s1, e1 = lim1_e
+            s2, e2 = lim2_e
             
-        fraction = (declination - declination1) / (declination2 - declination1)
-        start = start1 + (start2 - start1) * fraction
-        end = end1 + (end2 - end1) * fraction
-        
-        return start, end
+        frac = (declination - dec1) / (dec2 - dec1)
+        return s1 + (s2 - s1) * frac, e1 + (e2 - e1) * frac
 
     def get_west_track(self, declination):
-        """
-        Calculates the start and end hour angles for the western (setting) track.
-        
-        Args:
-            declination (float): The target declination in degrees.
+        """Calculates the start and end hour angles for the western (setting) track."""
+        if declination < self.declinations[0] or declination > self.declinations[-1]:
+            raise ValueError(f"Declination {declination} out of range.")
             
-        Returns:
-            tuple[float, float] | None: A tuple of (start_ha, end_ha) in 
-                decimal hours, or None if no western track exists for 
-                this declination.
-        """
-        lower_index = self._lower_index_for_value(declination, self.declinations)
+        idx = np.searchsorted(self.declinations, declination)
+        if idx == 0: idx = 1
+        if idx == len(self.declinations): idx = len(self.declinations) - 1
+                     
+        lim1_e, lim1_w = self._get_track_limits(self.declinations[idx-1])
+        lim2_e, lim2_w = self._get_track_limits(self.declinations[idx])
         
-        east_track1 = self.east_tracks[lower_index]
-        east_track2 = self.east_tracks[lower_index + 1]
-        west_track1 = self.west_tracks[lower_index]
-        west_track2 = self.west_tracks[lower_index + 1]
-        
-        declination1 = self.declinations[lower_index]
-        declination2 = self.declinations[lower_index + 1]
-        
-        if west_track1 and west_track2:
-            start1, end1 = west_track1[0]['hour_angle'], west_track1[-1]['hour_angle']
-            start2, end2 = west_track2[0]['hour_angle'], west_track2[-1]['hour_angle']
-        elif not west_track1 and west_track2:
-            start1, end1 = 0, east_track1[-1]['hour_angle']
-            start2, end2 = west_track2[0]['hour_angle'], west_track2[-1]['hour_angle']
-        elif west_track1 and not west_track2:
-            start1, end1 = west_track1[0]['hour_angle'], west_track1[-1]['hour_angle']
-            start2, end2 = 0, east_track2[-1]['hour_angle']
+        if lim1_w[0] is not None and lim2_w[0] is not None:
+            s1, e1 = lim1_w
+            s2, e2 = lim2_w
+        elif lim1_w[0] is None and lim2_w[0] is not None:
+            s1, e1 = 0.0, lim1_e[1]
+            s2, e2 = lim2_w
+        elif lim1_w[0] is not None and lim2_w[0] is None:
+            s1, e1 = lim1_w
+            s2, e2 = 0.0, lim2_e[1]
         else:
             return None
             
-        fraction = (declination - declination1) / (declination2 - declination1)
-        start = start1 + (start2 - start1) * fraction
-        end = end1 + (end2 - end1) * fraction
-        
-        return start, end
-
-    def _track_length_for_hour_angle(self, hour_angle, tl_info_list):
-        """
-        Calculates the available track length for a specific hour angle.
-        
-        Internal helper for interpolation within a single declination's track.
-        """
-        if not tl_info_list: return 0
-        if hour_angle < tl_info_list[0]['hour_angle'] or hour_angle >= tl_info_list[-1]['hour_angle']:
-            return 0
-            
-        ha_index = 0
-        while ha_index < len(tl_info_list) and tl_info_list[ha_index]['hour_angle'] <= hour_angle:
-            ha_index += 1
-        ha_index -= 1
-        if ha_index == len(tl_info_list) - 1: ha_index -= 1
-            
-        ha1, tl1 = tl_info_list[ha_index]['hour_angle'], tl_info_list[ha_index]['track_length']
-        ha2, tl2 = tl_info_list[ha_index + 1]['hour_angle'], tl_info_list[ha_index + 1]['track_length']
-        
-        return tl1 + ((tl2 - tl1) / (ha2 - ha1)) * (hour_angle - ha1)
+        frac = (declination - self.declinations[idx-1]) / (self.declinations[idx] - self.declinations[idx-1])
+        return s1 + (s2 - s1) * frac, e1 + (e2 - e1) * frac
 
     def track_length(self, declination, hour_angle):
         """
         Returns the available track length (in seconds) for a target.
-        
-        The result represents how many seconds the tracker can follow the 
-        target starting from the given hour angle before reaching the edge 
-        of its mechanical limit.
-
-        Args:
-            declination (float): The target declination in degrees.
-            hour_angle (float): The current hour angle in decimal hours.
-            
-        Returns:
-            float: Available track length in seconds. Returns 0 if the 
-                target is currently outside the tracking zone.
+        Supports scalar or NumPy array inputs for hour_angle.
         """
-        try:
-            declination_index = self._lower_index_for_value(declination, self.declinations)
-        except ValueError:
-            return 0
-            
-        east_track = self.get_east_track(declination)
-        west_track = self.get_west_track(declination)
+        ha = np.asarray(hour_angle)
         
-        if west_track:
-            if (hour_angle < east_track[0] or 
-                (hour_angle > east_track[1] and hour_angle < west_track[0]) or 
-                hour_angle > west_track[1]):
-                return 0
-        else:
-            if hour_angle < east_track[0] or hour_angle > east_track[1]:
-                return 0
-                
-        if self.west_tracks[declination_index] and self.west_tracks[declination_index + 1]:
-            tl_info_list1 = self.east_tracks[declination_index] if hour_angle < 0 else self.west_tracks[declination_index]
-            tl_info_list2 = self.east_tracks[declination_index + 1] if hour_angle < 0 else self.west_tracks[declination_index + 1]
-            track_length1 = self._track_length_for_hour_angle(hour_angle, tl_info_list1)
-            track_length2 = self._track_length_for_hour_angle(hour_angle, tl_info_list2)
-        elif not self.west_tracks[declination_index] and self.west_tracks[declination_index + 1]:
-            track_length1 = self._track_length_for_hour_angle(hour_angle, self.east_tracks[declination_index])
-            if hour_angle < 0:
-                rem = 3600 * (0 - hour_angle) / self.UT_TO_ST_FACTOR
-                if rem < track_length1: track_length1 = rem
+        if declination < self.declinations[0] or declination > self.declinations[-1]:
+            return np.zeros_like(ha, dtype=float) if not np.isscalar(hour_angle) else 0.0
             
-            tl_info_list2 = self.east_tracks[declination_index + 1] if hour_angle < 0 else self.west_tracks[declination_index + 1]
-            track_length2 = self._track_length_for_hour_angle(hour_angle, tl_info_list2)
-        elif self.west_tracks[declination_index] and not self.west_tracks[declination_index + 1]:
-            tl_info_list1 = self.east_tracks[declination_index] if hour_angle < 0 else self.west_tracks[declination_index]
-            track_length1 = self._track_length_for_hour_angle(hour_angle, tl_info_list1)
-            
-            track_length2 = self._track_length_for_hour_angle(hour_angle, self.east_tracks[declination_index + 1])
-            if hour_angle < 0:
-                rem = 3600 * (0 - hour_angle) / self.UT_TO_ST_FACTOR
-                if rem < track_length2: track_length2 = rem
-        else:
-            track_length1 = self._track_length_for_hour_angle(hour_angle, self.east_tracks[declination_index])
-            track_length2 = self._track_length_for_hour_angle(hour_angle, self.east_tracks[declination_index + 1])
-            
-        d1, d2 = self.declinations[declination_index], self.declinations[declination_index + 1]
-        fraction = (declination - d1) / (d2 - d1)
+        idx = np.searchsorted(self.declinations, declination)
+        if idx == 0: idx = 1
+        if idx == len(self.declinations): idx = len(self.declinations) - 1
         
-        return track_length1 + (track_length2 - track_length1) * fraction
+        dec1, dec2 = self.declinations[idx-1], self.declinations[idx]
+        
+        def get_tl_at_dec(d, ha_in):
+            e_ha, e_tl = self.east_data[d]
+            w_ha, w_tl = self.west_data[d]
+            
+            # This handles both scalars and arrays
+            res = np.zeros_like(ha_in, dtype=float)
+            
+            # Logic for East track
+            east_mask = (ha_in <= 0) | (len(w_ha) == 0)
+            if len(e_ha) > 0:
+                valid_e = (ha_in >= e_ha[0]) & (ha_in <= e_ha[-1]) & east_mask
+                if np.any(valid_e):
+                    res[valid_e] = np.interp(ha_in[valid_e], e_ha, e_tl) if not np.isscalar(ha_in) else np.interp(ha_in, e_ha, e_tl)
+            
+            # Logic for West track
+            if len(w_ha) > 0:
+                west_mask = (ha_in > 0)
+                valid_w = (ha_in >= w_ha[0]) & (ha_in <= w_ha[-1]) & west_mask
+                if np.any(valid_w):
+                    res[valid_w] = np.interp(ha_in[valid_w], w_ha, w_tl) if not np.isscalar(ha_in) else np.interp(ha_in, w_ha, w_tl)
+            
+            return res
+
+        # Interpolate between decs
+        tl1 = get_tl_at_dec(dec1, ha)
+        tl2 = get_tl_at_dec(dec2, ha)
+        
+        # Clipping logic for Zenith hole transition
+        if np.any(ha < 0):
+            rem_time = 3600.0 * (0.0 - ha) / self.UT_TO_ST_FACTOR
+            mask_neg = ha < 0
+            if -62.75 <= dec1 < -1.75 and not (-62.75 <= dec2 < -1.75):
+                tl2[mask_neg] = np.minimum(tl2[mask_neg], rem_time[mask_neg])
+            elif not (-62.75 <= dec1 < -1.75) and -62.75 <= dec2 < -1.75:
+                tl1[mask_neg] = np.minimum(tl1[mask_neg], rem_time[mask_neg])
+
+        frac = (declination - dec1) / (dec2 - dec1)
+        result = tl1 + (tl2 - tl1) * frac
+        
+        return result if not np.isscalar(hour_angle) else float(result)
 
     def get_max_track_length(self, declination):
-        """
-        Calculates the maximum possible track length for a given declination.
-        
-        Args:
-            declination (float): The target declination in degrees.
+        """Calculates the maximum possible track length for a given declination."""
+        if declination < self.declinations[0] or declination > self.declinations[-1]:
+            return 0.0
             
-        Returns:
-            float: Maximum track length in seconds. Returns 0 if the 
-                declination is never visible at SALT.
-        """
-        try:
-            declination_index = self._lower_index_for_value(declination, self.declinations)
-        except ValueError:
-            return 0
-            
-        tl_info_list = []
-        for i in [declination_index, declination_index + 1]:
-            tl_info_list.extend(self.east_tracks[i])
-            tl_info_list.extend(self.west_tracks[i])
+        idx = np.searchsorted(self.declinations, declination)
+        if idx == 0: idx = 1
+        if idx == len(self.declinations): idx = len(self.declinations) - 1
         
-        hour_angles = [info['hour_angle'] for info in tl_info_list]
-        max_track_length = 0
-        for ha in hour_angles:
-            length = self.track_length(declination, ha)
-            if length > max_track_length: max_track_length = length
-                
-        return max_track_length
+        d1, d2 = self.declinations[idx-1], self.declinations[idx]
+        ha_peaks = np.concatenate([self.east_data[d1][0], self.west_data[d1][0],
+                                   self.east_data[d2][0], self.west_data[d2][0]])
+        
+        if len(ha_peaks) == 0: return 0.0
+        
+        # Use vectorized track_length
+        lengths = self.track_length(declination, ha_peaks)
+        return np.max(lengths)
 
 def get_model():
-    """
-    Returns the singleton instance of the SaltTrackingModel.
-    
-    This is the preferred way to access the model to ensure efficient 
-    resource usage.
-
-    Returns:
-        SaltTrackingModel: The global singleton instance.
-    """
+    """Returns the singleton instance of the SaltTrackingModel."""
     return SaltTrackingModel()
