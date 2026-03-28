@@ -117,4 +117,4 @@ Why this is powerful
 *   **Multivariate Analysis:** This doesn't just check "is the star up?". It checks if the star is up, **AND** the sun is down, **AND** the moon is faint, **AND** the telescope tracker has enough room to finish the job.
 *   **TAC Justification:** Instead of saying "these targets are visible in winter," you can say "Target Centaurus A provides 178 hours of high-quality Gray time, averaging 73.7 minutes of track per night."
 *   **Survey Optimization:** You can see that NGC 253 is only available for 38 nights in this semester. This helps you prioritize it early in the season or move it to a different proposal.
-*   **Efficiency:** By using the ``SaltTrackingModel`` singleton and vectorizing the constraints with ``astroplan``, you can simulate hundreds of targets for a full year in just a few seconds.
+*   **Comprehensive Planning:** This script enables high-fidelity survey simulations that account for multiple physical and operational variables simultaneously, providing a robust baseline for complex proposals.
