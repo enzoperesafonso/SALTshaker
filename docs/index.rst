@@ -18,6 +18,13 @@ Welcome to the documentation for **saltishaker**, a specialized Python package f
 
 Because SALT operates with a unique fixed-altitude design (permanently pointing 37 degrees from the zenith), planning observations requires calculating complex visibility tracks based on Earth's rotation and a physical payload tracker. ``saltishaker`` handles these calculations for you, seamlessly integrating with the broader ``astroplan`` ecosystem.
 
+.. important::
+   **Essential Usage Information:**
+
+   1. **Independent Tool:** ``saltishaker`` is a community-developed tool and is **not** an official product of the South African Astronomical Observatory (SAAO) or SALT.
+   2. **Pre-Planning Only:** This package is designed for target screening, survey strategy optimization, and preliminary feasibility checks.
+   3. **Mandatory PIPT Validation:** All final visibility windows and observing proposals **must** be validated and submitted using the official **SALT Phase I Proposal Tool (PIPT)**.
+
 What can saltishaker do?
 ------------------------
 

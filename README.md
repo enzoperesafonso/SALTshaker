@@ -7,7 +7,10 @@
 **SALTishaker** is a specialized Python package designed for planning and optimizing astronomical observations with the **Southern African Large Telescope (SALT)**.
 
 > [!IMPORTANT]
-> **Disclaimer:** `saltishaker` is an independent community-developed tool and is **not** an official product of the South African Astronomical Observatory (SAAO). All final observing proposals **must** be validated and submitted using the official [SALT Phase I Proposal Tool (PIPT)](https://www.salt.ac.za/observing/proposal-tools/pipt/). Use this package for pre-planning, target screening, and strategy optimization.
+> **Essential Usage Information:**
+> 1. **Independent Tool:** `saltishaker` is a community-developed tool and is **not** an official product of the South African Astronomical Observatory (SAAO) or SALT.
+> 2. **Pre-Planning Only:** This package is designed for target screening, survey strategy optimization, and preliminary feasibility checks.
+> 3. **Mandatory PIPT Validation:** All final visibility windows and observing proposals **must** be validated and submitted using the official [SALT Phase I Proposal Tool (PIPT)](https://www.salt.ac.za/observing/proposal-tools/pipt/).
 
 Because SALT operates with a unique fixed-altitude design (pointing permanently at 37 degrees from the zenith), planning observations requires calculating complex visibility tracks based on Earth's rotation and a physical payload tracker. `saltishaker` handles these calculations for you, providing high-performance visibility windows, track lengths, and integration with the broader `astroplan` ecosystem.
 
