@@ -1,6 +1,8 @@
 # SALTshaker
 
-![SALTshaker](https://socialify.git.ci/enzoperesafonso/SALTshaker/image?description=1&font=Jost&language=1&name=1&owner=1&pattern=Solid&theme=Auto)
+<p align="center">
+  <img src="salt_shaker_logo.png" width="500" alt="SALTshaker Logo">
+</p>
 
 **SALTshaker** is a specialized Python package designed for planning astronomical observations with the **Southern African Large Telescope (SALT)**.
 
