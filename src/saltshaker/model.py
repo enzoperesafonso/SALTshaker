@@ -65,27 +65,36 @@ class SaltTrackingModel:
         self.east_data = {}  # {dec: (ha_array, tl_array)}
         self.west_data = {}  # {dec: (ha_array, tl_array)}
         
-        for dec in self.declinations:
+        # Pre-allocate arrays for vectorized limit lookup
+        self.e_start = np.zeros_like(self.declinations)
+        self.e_end = np.zeros_like(self.declinations)
+        self.w_start = np.full_like(self.declinations, np.nan)
+        self.w_end = np.full_like(self.declinations, np.nan)
+
+        for i, dec in enumerate(self.declinations):
             mask = data[:, 0] == dec
             dec_data = data[mask]
-            
-            # Use scalar float for dictionary keys to avoid unhashable type error
             dec_key = float(dec)
             
             if -62.75 <= dec < -1.75:
                 east_mask = dec_data[:, 1] <= 0
                 west_mask = dec_data[:, 1] > 0
                 
-                e_ha = dec_data[east_mask, 1]
-                e_tl = dec_data[east_mask, 2]
-                w_ha = dec_data[west_mask, 1]
-                w_tl = dec_data[west_mask, 2]
+                e_ha, e_tl = self._finalize_track_arrays(dec_data[east_mask, 1], dec_data[east_mask, 2])
+                w_ha, w_tl = self._finalize_track_arrays(dec_data[west_mask, 1], dec_data[west_mask, 2])
                 
-                self.east_data[dec_key] = self._finalize_track_arrays(e_ha, e_tl)
-                self.west_data[dec_key] = self._finalize_track_arrays(w_ha, w_tl)
+                self.east_data[dec_key] = (e_ha, e_tl)
+                self.west_data[dec_key] = (w_ha, w_tl)
+                
+                self.e_start[i], self.e_end[i] = e_ha[0], e_ha[-1]
+                self.w_start[i], self.w_end[i] = w_ha[0], w_ha[-1]
             else:
-                self.east_data[dec_key] = self._finalize_track_arrays(dec_data[:, 1], dec_data[:, 2])
+                e_ha, e_tl = self._finalize_track_arrays(dec_data[:, 1], dec_data[:, 2])
+                self.east_data[dec_key] = (e_ha, e_tl)
                 self.west_data[dec_key] = (np.array([]), np.array([]))
+                
+                self.e_start[i], self.e_end[i] = e_ha[0], e_ha[-1]
+                # w_start/end remain NaN
 
     def _finalize_track_arrays(self, ha, tl):
         """Helper to add the end-of-track point to NumPy arrays."""
@@ -98,73 +107,47 @@ class SaltTrackingModel:
         
         return ha_final, tl_final
 
-    def _get_track_limits(self, dec):
-        """Internal helper to get ha_start and ha_end for both tracks at a specific dec."""
-        # Ensure dec is a hashable scalar
-        dec_key = float(dec)
-        e_ha, _ = self.east_data[dec_key]
-        w_ha, _ = self.west_data[dec_key]
-        
-        e_limits = (e_ha[0], e_ha[-1]) if len(e_ha) > 0 else (None, None)
-        w_limits = (w_ha[0], w_ha[-1]) if len(w_ha) > 0 else (None, None)
-        
-        return e_limits, w_limits
-
     def get_east_track(self, declination):
         """Calculates the start and end hour angles for the eastern (rising) track."""
-        if declination < self.declinations[0] or declination > self.declinations[-1]:
-            raise ValueError(f"Declination {declination} out of range.")
+        dec = np.asarray(declination)
+        if np.any(dec < self.declinations[0]) or np.any(dec > self.declinations[-1]):
+            if np.isscalar(declination):
+                raise ValueError(f"Declination {declination} out of range.")
+            # For arrays, we could return NaNs or handle it, but following original logic:
+            dec = np.clip(dec, self.declinations[0], self.declinations[-1])
             
-        idx = np.searchsorted(self.declinations, declination)
-        if idx == 0: idx = 1
-        if idx == len(self.declinations): idx = len(self.declinations) - 1
-            
-        dec1, dec2 = self.declinations[idx-1], self.declinations[idx]
-        lim1_e, lim1_w = self._get_track_limits(dec1)
-        lim2_e, lim2_w = self._get_track_limits(dec2)
+        s = np.interp(dec, self.declinations, self.e_start)
+        e = np.interp(dec, self.declinations, self.e_end)
         
-        if lim1_w[0] is not None and lim2_w[0] is not None:
-            s1, e1 = lim1_e
-            s2, e2 = lim2_e
-        elif lim1_w[0] is None and lim2_w[0] is not None:
-            s1, e1 = lim1_e[0], 0.0
-            s2, e2 = lim2_e
-        elif lim1_w[0] is not None and lim2_w[0] is None:
-            s1, e1 = lim1_e
-            s2, e2 = lim2_e[0], 0.0
-        else:
-            s1, e1 = lim1_e
-            s2, e2 = lim2_e
-            
-        frac = (declination - dec1) / (dec2 - dec1)
-        return s1 + (s2 - s1) * frac, e1 + (e2 - e1) * frac
+        return (float(s), float(e)) if np.isscalar(declination) else (s, e)
 
     def get_west_track(self, declination):
         """Calculates the start and end hour angles for the western (setting) track."""
-        if declination < self.declinations[0] or declination > self.declinations[-1]:
-            raise ValueError(f"Declination {declination} out of range.")
-            
-        idx = np.searchsorted(self.declinations, declination)
-        if idx == 0: idx = 1
-        if idx == len(self.declinations): idx = len(self.declinations) - 1
-                     
-        lim1_e, lim1_w = self._get_track_limits(self.declinations[idx-1])
-        lim2_e, lim2_w = self._get_track_limits(self.declinations[idx])
+        dec = np.asarray(declination)
         
-        if lim1_w[0] is not None and lim2_w[0] is not None:
-            s1, e1 = lim1_w
-            s2, e2 = lim2_w
-        elif lim1_w[0] is None and lim2_w[0] is not None:
-            s1, e1 = 0.0, lim1_e[1]
-            s2, e2 = lim2_w
-        elif lim1_w[0] is not None and lim2_w[0] is None:
-            s1, e1 = lim1_w
-            s2, e2 = 0.0, lim2_e[1]
-        else:
-            return None
+        # Mask for declinations that HAVE a west track (not NaN in our pre-calculated arrays)
+        has_west = ~np.isnan(self.w_start)
+        if not np.any(has_west):
+            return None if np.isscalar(declination) else (np.zeros_like(dec)*np.nan, np.zeros_like(dec)*np.nan)
+
+        valid_decs = self.declinations[has_west]
+        valid_w_start = self.w_start[has_west]
+        valid_w_end = self.w_end[has_west]
+        
+        # Check if requested decs are within the range that HAS a west track
+        # Outside this range, they might still be valid declinations but only have an east track
+        mask_in_range = (dec >= valid_decs[0]) & (dec <= valid_decs[-1])
+        
+        res_s = np.full_like(dec, np.nan, dtype=float)
+        res_e = np.full_like(dec, np.nan, dtype=float)
+        
+        if np.any(mask_in_range):
+            res_s[mask_in_range] = np.interp(dec[mask_in_range], valid_decs, valid_w_start)
+            res_e[mask_in_range] = np.interp(dec[mask_in_range], valid_decs, valid_w_end)
             
-        frac = (declination - self.declinations[idx-1]) / (self.declinations[idx] - self.declinations[idx-1])
-        return s1 + (s2 - s1) * frac, e1 + (e2 - e1) * frac
+        if np.isscalar(declination):
+            return (float(res_s), float(res_e)) if not np.isnan(res_s) else None
+        return res_s, res_e
 
     def track_length(self, declination, hour_angle):
         """

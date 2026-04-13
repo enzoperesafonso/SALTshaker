@@ -9,6 +9,7 @@ from astroplan import Observer
 from astropy.coordinates import EarthLocation, SkyCoord
 import astropy.units as u
 from saltshaker.model import get_model
+from functools import lru_cache
 
 class SaltObserver(Observer):
     """
@@ -48,6 +49,17 @@ class SaltObserver(Observer):
         super().__init__(**kwargs)
         self.tracking_model = get_model()
 
+    def local_sidereal_time(self, time):
+        """Cached version of local_sidereal_time (for scalars only)."""
+        if hasattr(time, 'isscalar') and not time.isscalar:
+            return super().local_sidereal_time(time)
+        return self._local_sidereal_time_cached(time)
+
+    @lru_cache(maxsize=128)
+    def _local_sidereal_time_cached(self, time):
+        """Internal cached method for scalar times."""
+        return super().local_sidereal_time(time)
+
     def get_tracks(self, target, time):
         """
         Calculates all visibility windows for a target on a given date.
@@ -82,11 +94,17 @@ class SaltObserver(Observer):
         from saltshaker.planning import get_track_length
         return get_track_length(target, time, observer=self)
 
+_cached_observer = None
+
 def get_salt_observer():
     """
     Factory function to get a pre-configured SaltObserver instance.
+    Uses a cached singleton instance for performance.
 
     Returns:
         SaltObserver: An observer instance set to SALT's coordinates.
     """
-    return SaltObserver()
+    global _cached_observer
+    if _cached_observer is None:
+        _cached_observer = SaltObserver()
+    return _cached_observer
