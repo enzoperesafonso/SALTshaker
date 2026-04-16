@@ -57,9 +57,6 @@ for track in tracks:
     print(f"Visible from {track.start_time_utc} to {track.end_time_utc}")
 ```
 
-## Documentation
-
-Full documentation, including a theoretical background on SALT visibility and a "Proposer's Cookbook" of examples, is available at:
 
 ## License
 
