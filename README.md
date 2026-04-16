@@ -61,8 +61,6 @@ for track in tracks:
 
 Full documentation, including a theoretical background on SALT visibility and a "Proposer's Cookbook" of examples, is available at:
 
-**[https://saltishaker.readthedocs.io/](https://saltishaker.readthedocs.io/)**
-
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
