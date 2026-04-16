@@ -8,7 +8,7 @@
 
 > [!IMPORTANT]
 > **Essential Usage Information:**
-> 1. **Independent Tool:** `saltishaker` is a community-developed tool and is **not** an official product of the South African Astronomical Observatory (SAAO) or SALT.
+> 1. **Independent Tool:** `saltishaker` is a community-developed tool.
 > 2. **Pre-Planning Only:** This package is designed for target screening, survey strategy optimization, and preliminary feasibility checks.
 > 3. **Mandatory PIPT Validation:** All final visibility windows and observing proposals **must** be validated and submitted using the official SALT Phase I Proposal Tool.
 
