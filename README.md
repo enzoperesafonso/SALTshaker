@@ -4,6 +4,21 @@
   <img src="salt_shaker_logo.png" width="500" alt="SALTishaker Logo">
 </p>
 
+<p align="center">
+  <a href="https://github.com/enzoperesafonso/SALTshaker/actions/workflows/ci.yml">
+    <img src="https://github.com/enzoperesafonso/SALTshaker/actions/workflows/ci.yml/badge.svg" alt="CI Status">
+  </a>
+  <a href="https://github.com/enzoperesafonso/SALTshaker/releases">
+    <img src="https://img.shields.io/github/v/release/enzoperesafonso/SALTshaker" alt="Latest Version">
+  </a>
+  <a href="https://www.python.org/downloads/">
+    <img src="https://img.shields.io/badge/python-3.12+-blue.svg" alt="Python 3.12+">
+  </a>
+  <a href="https://doi.org/10.5281/zenodo.19878634">
+    <img src="https://zenodo.org/badge/1124345702.svg" alt="DOI">
+  </a>
+</p>
+
 **SALTishaker** is a specialized Python package designed for planning and optimizing astronomical observations with the **Southern African Large Telescope (SALT)**.
 
 > [!IMPORTANT]

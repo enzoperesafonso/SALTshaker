@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Peres Afonso"
+  given-names: "Enzo"
+title: "SALTSHAKER: A COMMUNITY PYTHON PACKAGE VISIBILITY AND OBSERVATION PLANNING FOR THE SOUTHERN AFRICAN LARGE TELESCOPE"
+version: 0.2.1
+doi: 10.5281/zenodo.19878634
+date-released: 2026-04-29
+url: "https://github.com/enzoperesafonso/saltishaker"
+repository-code: "https://github.com/enzoperesafonso/saltishaker"
+keywords:
+  - astronomy
+  - SALT
+  - telescope
+  - observing
+  - planning
+license: MIT
