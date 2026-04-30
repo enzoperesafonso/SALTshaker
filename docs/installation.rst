@@ -16,29 +16,29 @@ Requirements
 Standard Installation
 ---------------------
 
-You can install ``saltishaker`` via ``pip`` (once published to PyPI):
+You can install ``saltshaker`` via ``pip`` (once published to PyPI):
 
 .. code-block:: bash
 
-    pip install saltishaker
+    pip install saltshaker
 
 Alternatively, you can install directly from the GitHub repository:
 
 .. code-block:: bash
 
-    pip install git+https://github.com/enzo-peres-afonso/saltishaker.git
+    pip install git+https://github.com/enzo-peres-afonso/saltshaker.git
 
 Development Installation
 ------------------------
 
-If you want to contribute to ``saltishaker`` or modify the source code, we recommend using `Poetry <https://python-poetry.org/>`_ to manage your environment.
+If you want to contribute to ``saltshaker`` or modify the source code, we recommend using `Poetry <https://python-poetry.org/>`_ to manage your environment.
 
 1. Clone the repository:
 
    .. code-block:: bash
 
-       git clone https://github.com/enzo-peres-afonso/saltishaker.git
-       cd saltishaker
+       git clone https://github.com/enzo-peres-afonso/saltshaker.git
+       cd saltshaker
 
 2. Install dependencies (including development tools like ``pytest``, ``ruff``, and ``sphinx``):
 

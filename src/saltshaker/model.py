@@ -167,7 +167,7 @@ class SaltTrackingModel:
         
         def get_tl_at_dec(d, ha_in):
             # Ensure d is a hashable scalar
-            d_key = float(d)
+            d_key = float(np.asarray(d).item()) if np.asarray(d).size == 1 else float(d)
             e_ha, e_tl = self.east_data[d_key]
             w_ha, w_tl = self.west_data[d_key]
             

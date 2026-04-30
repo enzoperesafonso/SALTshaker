@@ -4,10 +4,10 @@ sys.path.insert(0, os.path.abspath('../src'))
 
 # -- Project information -----------------------------------------------------
 
-project = 'saltishaker'
+project = 'saltshaker'
 copyright = '2026, Enzo Peres Afonso'
 author = 'Enzo Peres Afonso'
-release = '0.1.0'
+release = '0.2.1'
 
 # -- General configuration ---------------------------------------------------
 

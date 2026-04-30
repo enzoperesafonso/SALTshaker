@@ -1,10 +1,10 @@
-saltishaker: Observation Planning for SALT
+saltshaker: Observation Planning for SALT
 ==========================================
 
 .. image:: _static/salt_shaker_logo.png
    :align: center
    :width: 400px
-   :alt: SALTishaker Logo
+   :alt: saltshaker Logo
 
 .. image:: https://img.shields.io/badge/python-3.12+-blue.svg
    :target: https://www.python.org/downloads/
@@ -14,18 +14,18 @@ saltishaker: Observation Planning for SALT
    :target: https://www.astropy.org/
    :alt: Powered by Astropy
 
-Welcome to the documentation for **saltishaker**, a specialized Python package for planning astronomical observations with the Southern African Large Telescope (SALT).
+Welcome to the documentation for **saltshaker**, a specialized Python package for planning astronomical observations with the Southern African Large Telescope (SALT).
 
-Because SALT operates with a unique fixed-altitude design (permanently pointing 37 degrees from the zenith), planning observations requires calculating complex visibility tracks based on Earth's rotation and a physical payload tracker. ``saltishaker`` handles these calculations for you, seamlessly integrating with the broader ``astroplan`` ecosystem.
+Because SALT operates with a unique fixed-altitude design (permanently pointing 37 degrees from the zenith), planning observations requires calculating complex visibility tracks based on Earth's rotation and a physical payload tracker. ``saltshaker`` handles these calculations for you, seamlessly integrating with the broader ``astroplan`` ecosystem.
 
 .. important::
    **Essential Usage Information:**
 
-   1. **Independent Tool:** ``saltishaker`` is a community-developed tool and is **not** an official product of the South African Astronomical Observatory (SAAO) or SALT.
+   1. **Independent Tool:** ``saltshaker`` is a community-developed tool and is **not** an official product of the South African Astronomical Observatory (SAAO) or SALT.
    2. **Pre-Planning Only:** This package is designed for target screening, survey strategy optimization, and preliminary feasibility checks.
    3. **Mandatory PIPT Validation:** All final visibility windows and observing proposals **must** be validated and submitted using the official **SALT Phase I Proposal Tool (PIPT)**.
 
-What can saltishaker do?
+What can saltshaker do?
 ------------------------
 
 * **Visibility Windows:** Calculate exactly when (UTC) a specific star or galaxy will drift into SALT's field of view.
