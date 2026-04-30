@@ -1,18 +1,18 @@
-# saltshaker
+# SALTishaker
 
 <p align="center">
-  <img src="salt_shaker_logo.png" width="500" alt="saltshaker Logo">
+  <img src="salt_shaker_logo.png" width="500" alt="SALTishaker Logo">
 </p>
 
-**saltshaker** is a specialized Python package designed for planning and optimizing astronomical observations with the **Southern African Large Telescope (SALT)**.
+**SALTishaker** is a specialized Python package designed for planning and optimizing astronomical observations with the **Southern African Large Telescope (SALT)**.
 
 > [!IMPORTANT]
 > **Essential Usage Information:**
-> 1. **Independent Tool:** `saltshaker` is a community-developed tool and is **not** an official product of the South African Astronomical Observatory (SAAO) or SALT.
+> 1. **Independent Tool:** `saltishaker` is a community-developed tool and is **not** an official product of the South African Astronomical Observatory (SAAO) or SALT.
 > 2. **Pre-Planning Only:** This package is designed for target screening, survey strategy optimization, and preliminary feasibility checks.
 > 3. **Mandatory PIPT Validation:** All final visibility windows and observing proposals **must** be validated and submitted using the official [SALT Phase I Proposal Tool (PIPT)](https://www.salt.ac.za/observing/proposal-tools/pipt/).
 
-Because SALT operates with a unique fixed-altitude design (pointing permanently at 37 degrees from the zenith), planning observations requires calculating complex visibility tracks based on Earth's rotation and a physical payload tracker. `saltshaker` handles these calculations for you, providing high-performance visibility windows, track lengths, and integration with the broader `astroplan` ecosystem.
+Because SALT operates with a unique fixed-altitude design (pointing permanently at 37 degrees from the zenith), planning observations requires calculating complex visibility tracks based on Earth's rotation and a physical payload tracker. `saltishaker` handles these calculations for you, providing high-performance visibility windows, track lengths, and integration with the broader `astroplan` ecosystem.
 
 ## Key Features
 
@@ -25,14 +25,14 @@ Because SALT operates with a unique fixed-altitude design (pointing permanently 
 ## Installation
 
 ```bash
-pip install saltshaker
+pip install saltishaker
 ```
 
 For development installation:
 
 ```bash
-git clone https://github.com/enzo-peres-afonso/saltshaker.git
-cd saltshaker
+git clone https://github.com/enzo-peres-afonso/saltishaker.git
+cd saltishaker
 pip install .
 ```
 
@@ -61,7 +61,7 @@ for track in tracks:
 
 Full documentation, including a theoretical background on SALT visibility and a "Proposer's Cookbook" of examples, is available at:
 
-**[https://saltshaker.readthedocs.io/](https://saltshaker.readthedocs.io/)**
+**[https://saltishaker.readthedocs.io/](https://saltishaker.readthedocs.io/)**
 
 ## License
 
