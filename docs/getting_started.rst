@@ -8,8 +8,8 @@ You can install ``saltshaker`` via pip (once published) or by cloning the reposi
 
 .. code-block:: bash
 
-    git clone https://github.com/enzo-peres-afonso/saltishaker.git
-    cd saltishaker
+    git clone https://github.com/enzo-peres-afonso/saltshaker.git
+    cd saltshaker
     poetry install
 
 Basic Concepts
@@ -30,10 +30,10 @@ Because of this design, a target is only visible when its position on the sky in
 2. **Zenith Hole:** The target passes inside the ring (too high for SALT to see).
 3. **West Track:** The target re-enters the ring while setting.
 
-Two Ways to Use saltishaker
+Two Ways to Use saltshaker
 ---------------------------
 
-``saltishaker`` provides both an **Object-Oriented** API (using a ``SaltObserver`` object) and a **Functional** API (using standalone functions). Both are equally valid and return the same results.
+``saltshaker`` provides both an **Object-Oriented** API (using a ``SaltObserver`` object) and a **Functional** API (using standalone functions). Both are equally valid and return the same results.
 
 Using the SaltObserver (Object-Oriented)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -1,10 +1,10 @@
 Proposer's Cookbook: Planning for SALT
 ========================================
 
-This page provides practical examples for using ``saltishaker`` to prepare and optimize observing strategies for the Southern African Large Telescope (SALT). 
+This page provides practical examples for using ``saltshaker`` to prepare and optimize observing strategies for the Southern African Large Telescope (SALT). 
 
 .. important::
-   **Essential Usage Information:** ``saltishaker`` is an independent pre-planning tool and is **not** an official SALT product. While it provides high-fidelity models, all final observing proposals **must** be validated and submitted using the official **SALT Phase I Proposal Tool (PIPT)**. 
+   **Essential Usage Information:** ``saltshaker`` is an independent pre-planning tool and is **not** an official SALT product. While it provides high-fidelity models, all final observing proposals **must** be validated and submitted using the official **SALT Phase I Proposal Tool (PIPT)**. 
 
    Use these examples to screen targets, optimize your strategy, and generate preliminary plots for your Technical Justification, but always perform a final check in the PIPT before submission.
 
@@ -102,7 +102,7 @@ This visualization helps you understand when your target is observable relative 
 Preliminary Scheduling: Moon and Track Length
 ---------------------------------------------
 
-Using ``saltishaker`` with ``astroplan`` allows you to estimate when your target meets both SALT's tracking requirements and your project's preliminary lunar constraints. This visualization includes environmental context (night/day) to help you understand the specific observing windows.
+Using ``saltshaker`` with ``astroplan`` allows you to estimate when your target meets both SALT's tracking requirements and your project's preliminary lunar constraints. This visualization includes environmental context (night/day) to help you understand the specific observing windows.
 
 .. plot::
 
@@ -292,6 +292,15 @@ Calculating preliminary statistics on observable hours helps you determine if yo
     print(f"  - Estimated Total Observable Hours: {total_sec / 3600:.1f} hours")
     print(f"  - Number of Observable Nights: {observable_nights}")
     print(f"  - Estimated Average Track per Night: {(total_sec/observable_nights)/60:.1f} minutes")
+
+**Example Output:**
+
+.. code-block:: text
+
+    Preliminary Statistics for NGC 300 (Semester 2026-1):
+      - Estimated Total Observable Hours: 161.3 hours
+      - Number of Observable Nights: 132
+      - Estimated Average Track per Night: 73.3 minutes
 
 Catalog Screening: Preliminary Catalog Feasibility
 --------------------------------------------------

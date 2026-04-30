@@ -55,6 +55,7 @@ class SaltTrackLengthConstraint(Constraint):
         for i, target in enumerate(targets):
             declination = target.dec.to(u.deg).value
             ra = target.ra
+
             
             # 3. Calculate all hour angles at once (Vectorized)
             ha = (lst - ra).to(u.hourangle).value

@@ -1,7 +1,7 @@
 Advanced Example: Semester-level Planning
 =======================================
 
-This example demonstrates how ``saltishaker`` can be used to help plan and prioritize observations across an entire **6-month observing semester**. 
+This example demonstrates how ``saltshaker`` can be used to help plan and prioritize observations across an entire **6-month observing semester**. 
 
 .. important::
    This example is provided for **pre-planning and strategy optimization only**. While it uses high-fidelity models, all visibility windows, track lengths, and final proposal details **must** be confirmed using the official **SALT Phase I Proposal Tool (PIPT)**. These results should be used as a guide to help you select and prioritize targets before performing final validation in the PIPT.
@@ -106,11 +106,11 @@ The output of this script provides a baseline to help guide your observing strat
 
     --- Preliminary Semester 2026-1 Planning Report ---
          Target  Nights Available  Est. Total Hours  Est. Avg Min/Night
-       NGC 1365                42               48.0                68.6
-            M83               138              162.5                70.7
-    Centaurus A               145              178.0                73.7
-        NGC 253                38               42.5                67.1
-           M104               122              145.0                71.3
+       NGC 1365                48              26.5                33.1
+            M83               103              72.2                42.1
+    Centaurus A               106              89.5                50.7
+        NGC 253                79              44.0                33.4
+           M104                89              82.2                55.4
 
 Strategic Benefits
 ------------------

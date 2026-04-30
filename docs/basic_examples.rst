@@ -1,7 +1,7 @@
 Basic Examples
 ==============
 
-This page provides simple, direct code snippets for common tasks using ``saltishaker``. These examples focus on the API functionality without complex plotting or scientific justification.
+This page provides simple, direct code snippets for common tasks using ``saltshaker``. These examples focus on the API functionality without complex plotting or scientific justification.
 
 Checking if a Target is Ever Observable
 ---------------------------------------
@@ -49,8 +49,8 @@ Get the exact UTC times when a target enters and exits the SALT visibility annul
 
 .. code-block:: text
 
-    Track 1: 2026-01-15 17:34:12 to 2026-01-15 18:25:44 (51.5 minutes)
-    Track 2: 2026-01-15 22:15:05 to 2026-01-15 23:06:37 (51.5 minutes)
+    Track 1: 2026-01-15 18:40:59 to 2026-01-15 19:44:25 (63.4 minutes)
+    Track 2: 2026-01-15 23:37:56 to 2026-01-16 00:42:05 (64.2 minutes)
 
 Checking Current Track Length
 -----------------------------
@@ -65,7 +65,7 @@ Check how many seconds of tracking are remaining for a target at a specific mome
     import astropy.units as u
 
     target = SkyCoord.from_name("Sirius")
-    check_time = Time("2026-01-15 20:00:00")
+    check_time = Time("2026-01-15 19:15:00")
 
     rem = get_track_length(target, check_time)
     print(f"Remaining track length: {rem}")
@@ -75,8 +75,8 @@ Check how many seconds of tracking are remaining for a target at a specific mome
 
 .. code-block:: text
 
-    Remaining track length: 2712.4 s
-    In minutes: 45.21 min
+    Remaining track length: 1765.4 s
+    In minutes: 29.42 min
 
 Working with Semesters
 ----------------------
