@@ -10,6 +10,10 @@ saltshaker: Observation Planning for SALT
    :target: https://www.python.org/downloads/
    :alt: Python 3.12+
 
+.. image:: https://readthedocs.org/projects/saltishaker/badge/?version=latest
+   :target: https://saltishaker.readthedocs.io/en/latest/?badge=latest
+   :alt: Documentation Status
+
 .. image:: https://img.shields.io/badge/astropy-powered-orange.svg
    :target: https://www.astropy.org/
    :alt: Powered by Astropy

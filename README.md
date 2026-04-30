@@ -76,7 +76,7 @@ for track in tracks:
 
 Full documentation, including a theoretical background on SALT visibility and a "Proposer's Cookbook" of examples, is available at:
 
-**[https://saltshaker.readthedocs.io/](https://saltshaker.readthedocs.io/)**
+**[https://saltishaker.readthedocs.io/en/latest/](https://saltshaker.readthedocs.io/en/latest/)**
 
 ## License
 
