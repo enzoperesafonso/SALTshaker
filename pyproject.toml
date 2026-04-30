@@ -1,5 +1,5 @@
 [project]
-name = "saltshaker"
+name = "saltishaker"
 version = "1.0.0"
 description = "A python package for planning astronomical observations with the South African Large Telescope."
 authors = [
