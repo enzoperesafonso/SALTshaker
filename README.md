@@ -39,9 +39,14 @@ Because SALT operates with a unique fixed-altitude design (pointing permanently 
 
 ## Installation
 
+To install the package from PyPI:
+
 ```bash
-pip install saltshaker
+pip install saltishaker
 ```
+
+> [!NOTE]
+> Although the package is installed as `saltishaker`, you import it in your code as `saltshaker`.
 
 For development installation:
 
@@ -76,7 +81,7 @@ for track in tracks:
 
 Full documentation, including a theoretical background on SALT visibility and a "Proposer's Cookbook" of examples, is available at:
 
-**[https://saltishaker.readthedocs.io/en/latest/](https://saltshaker.readthedocs.io/en/latest/)**
+**[https://saltishaker.readthedocs.io/en/latest/](https://saltishaker.readthedocs.io/en/latest/)**
 
 ## License
 

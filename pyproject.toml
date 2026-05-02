@@ -36,7 +36,7 @@ docs = [
 
 [project.urls]
 Homepage = "https://saltishaker.readthedocs.io/"
-Repository = "https://github.com/enzoperesafonso/saltishaker"
+Repository = "https://github.com/enzoperesafonso/saltshaker"
 Documentation = "https://saltishaker.readthedocs.io/"
 
 [tool.poetry]

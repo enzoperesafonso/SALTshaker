@@ -7,8 +7,8 @@ title: "SALTSHAKER: A COMMUNITY PYTHON PACKAGE VISIBILITY AND OBSERVATION PLANNI
 version: 0.2.1
 doi: 10.5281/zenodo.19878634
 date-released: 2026-04-29
-url: "https://github.com/enzoperesafonso/saltishaker"
-repository-code: "https://github.com/enzoperesafonso/saltishaker"
+url: "https://github.com/enzoperesafonso/saltshaker"
+repository-code: "https://github.com/enzoperesafonso/saltshaker"
 keywords:
   - astronomy
   - SALT
