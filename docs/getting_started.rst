@@ -4,11 +4,17 @@ Getting Started
 Installation
 ------------
 
-You can install ``saltshaker`` via pip (once published) or by cloning the repository:
+You can install the package via pip:
 
 .. code-block:: bash
 
-    git clone https://github.com/enzo-peres-afonso/saltshaker.git
+    pip install saltishaker
+
+Alternatively, you can clone the repository for development:
+
+.. code-block:: bash
+
+    git clone https://github.com/enzoperesafonso/saltshaker.git
     cd saltshaker
     poetry install
 

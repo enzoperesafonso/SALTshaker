@@ -16,17 +16,20 @@ Requirements
 Standard Installation
 ---------------------
 
-You can install ``saltshaker`` via ``pip`` (once published to PyPI):
+You can install the package via ``pip``:
 
 .. code-block:: bash
 
-    pip install saltshaker
+    pip install saltishaker
+
+.. note::
+    While the package is listed on PyPI as ``saltishaker``, it is imported in Python as ``saltshaker``. All examples in this documentation use the ``saltshaker`` import.
 
 Alternatively, you can install directly from the GitHub repository:
 
 .. code-block:: bash
 
-    pip install git+https://github.com/enzo-peres-afonso/saltshaker.git
+    pip install git+https://github.com/enzoperesafonso/saltshaker.git
 
 Development Installation
 ------------------------
