@@ -5,11 +5,12 @@ This module provides the `SaltObserver` class, which extends the standard
 `astroplan.Observer` with SALT-specific tracking and planning capabilities.
 """
 
-from astroplan import Observer
-from astropy.coordinates import EarthLocation, SkyCoord
 import astropy.units as u
+from astroplan import Observer
+from astropy.coordinates import EarthLocation
+
 from saltshaker.model import get_model
-from functools import lru_cache
+
 
 class SaltObserver(Observer):
     """
@@ -49,18 +50,7 @@ class SaltObserver(Observer):
         super().__init__(**kwargs)
         self.tracking_model = get_model()
 
-    def local_sidereal_time(self, time):
-        """Cached version of local_sidereal_time (for scalars only)."""
-        if hasattr(time, 'isscalar') and not time.isscalar:
-            return super().local_sidereal_time(time)
-        return self._local_sidereal_time_cached(time)
-
-    @lru_cache(maxsize=128)
-    def _local_sidereal_time_cached(self, time):
-        """Internal cached method for scalar times."""
-        return super().local_sidereal_time(time)
-
-    def get_tracks(self, target, time):
+    def get_tracks(self, target, time, night_only=False):
         """
         Calculates all visibility windows for a target on a given date.
         
@@ -68,15 +58,17 @@ class SaltObserver(Observer):
 
         Args:
             target (SkyCoord): The celestial coordinates of the target.
-            time (Time): The observation date. This typically represents 
-                the noon-to-noon observing window.
+            time (Time | str): Start of the 24-hour search window. A 
+                date-only string starts at 12:00 UTC on that date; a `Time` 
+                is used exactly as given (see `get_visibility_windows`).
+            night_only (bool): Clip windows to astronomical night.
 
         Returns:
             list[VisibilityWindow]: A list of objects representing the 
                 time intervals when the target is observable.
         """
         from saltshaker.planning import get_visibility_windows
-        return get_visibility_windows(target, time, observer=self)
+        return get_visibility_windows(target, time, observer=self, night_only=night_only)
 
     def track_length(self, target, time):
         """
@@ -86,7 +78,7 @@ class SaltObserver(Observer):
 
         Args:
             target (SkyCoord): The celestial coordinates of the target.
-            time (Time): The exact moment to check.
+            time (Time): The exact moment(s) to check; scalar or array.
 
         Returns:
             Quantity: The available tracking duration in units of time (seconds).

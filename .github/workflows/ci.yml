@@ -24,22 +24,14 @@ jobs:
           virtualenvs-create: true
           virtualenvs-in-project: true
 
-      - name: Load cached venv
-        id: cached-poetry-dependencies
-        uses: actions/cache@v4
-        with:
-          path: .venv
-          key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
-
-      - name: Install dependencies
-        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
-        run: poetry install --no-interaction --no-root
-
       - name: Install project
-        run: poetry install --no-interaction
+        run: poetry install --no-interaction --extras "plot docs"
 
-#      - name: Run Ruff (Linting)
-#        run: poetry run ruff check .
+      - name: Run Ruff (Linting)
+        run: poetry run ruff check .
 
       - name: Run Tests (Pytest)
         run: poetry run pytest
+
+      - name: Build docs
+        run: poetry run sphinx-build -b html docs docs/_build/html

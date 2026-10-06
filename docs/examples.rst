@@ -35,7 +35,7 @@ The following plot can help you estimate the available "window of opportunity" f
 
     # Sample the tracking zone over 24 hours
     times = start_time + np.linspace(0, 24, 1000) * u.hour
-    track_lengths = [get_track_length(target, t).to(u.second).value for t in times]
+    track_lengths = get_track_length(target, times).to(u.second).value
 
     plt.figure(figsize=(10, 5))
     plt.fill_between(times.plot_date, track_lengths, color='red', alpha=0.1)
@@ -44,7 +44,7 @@ The following plot can help you estimate the available "window of opportunity" f
     # Reference line for an intended 30-minute exposure
     plt.axhline(1800, color='black', linestyle='--', label='Intended 30 min Exposure')
 
-    plt.title(f"Estimated Tracking Time for {target.name}")
+    plt.title("Estimated Tracking Time for Sirius")
     plt.ylabel("Available Track Length (seconds)")
     plt.xlabel("Time (UTC)")
     plt.legend()
@@ -267,7 +267,8 @@ Calculating preliminary statistics on observable hours helps you determine if yo
     from astropy.coordinates import SkyCoord
     from saltshaker import get_visibility_windows, get_semester_nights
 
-    target = SkyCoord.from_name('NGC 300')
+    target_name = 'NGC 300'
+    target = SkyCoord.from_name(target_name)
     year, semester = 2026, 1
     nights = get_semester_nights(year, semester)
     
@@ -288,7 +289,7 @@ Calculating preliminary statistics on observable hours helps you determine if yo
             total_sec += night_sec
             observable_nights += 1
 
-    print(f"Preliminary Statistics for {target.name} (Semester {year}-{semester}):")
+    print(f"Preliminary Statistics for {target_name} (Semester {year}-{semester}):")
     print(f"  - Estimated Total Observable Hours: {total_sec / 3600:.1f} hours")
     print(f"  - Number of Observable Nights: {observable_nights}")
     print(f"  - Estimated Average Track per Night: {(total_sec/observable_nights)/60:.1f} minutes")
@@ -298,14 +299,14 @@ Calculating preliminary statistics on observable hours helps you determine if yo
 .. code-block:: text
 
     Preliminary Statistics for NGC 300 (Semester 2026-1):
-      - Estimated Total Observable Hours: 161.3 hours
-      - Number of Observable Nights: 132
-      - Estimated Average Track per Night: 73.3 minutes
+      - Estimated Total Observable Hours: 219.5 hours
+      - Number of Observable Nights: 163
+      - Estimated Average Track per Night: 80.8 minutes
 
 Catalog Screening: Preliminary Catalog Feasibility
 --------------------------------------------------
 
-If your project involves a large catalog of targets, you can use these functions to quickly screen for objects that fall within SALT'sreachable range.
+If your project involves a large catalog of targets, you can use these functions to quickly screen for objects that fall within SALT's reachable range.
 
 .. code-block:: python
 

@@ -16,7 +16,7 @@ Alternatively, you can clone the repository for development:
 
     git clone https://github.com/enzoperesafonso/saltshaker.git
     cd saltshaker
-    poetry install
+    poetry install --with dev --extras "plot docs"
 
 Basic Concepts
 --------------
@@ -75,6 +75,7 @@ If you prefer not to manage an observer object, you can use standalone functions
     from saltshaker import get_visibility_windows, get_track_length
     from astropy.coordinates import SkyCoord
     from astropy.time import Time
+    import astropy.units as u
 
     target = SkyCoord.from_name("Sirius")
     time = Time("2026-01-15 12:00:00")

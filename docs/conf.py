@@ -1,5 +1,6 @@
 import os
 import sys
+
 sys.path.insert(0, os.path.abspath('../src'))
 
 # -- Project information -----------------------------------------------------
@@ -7,7 +8,12 @@ sys.path.insert(0, os.path.abspath('../src'))
 project = 'saltshaker'
 copyright = '2026, Enzo Peres Afonso'
 author = 'Enzo Peres Afonso'
-release = '1.0.0'
+try:
+    from importlib.metadata import PackageNotFoundError
+    from importlib.metadata import version as _version
+    release = _version('saltishaker')
+except PackageNotFoundError:
+    release = 'dev'
 
 # -- General configuration ---------------------------------------------------
 

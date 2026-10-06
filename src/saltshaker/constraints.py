@@ -5,10 +5,12 @@ This module provides constraint classes that integrate with the `astroplan`
 scheduling ecosystem to enforce SALT's unique tracking and lunar limits.
 """
 
-from astroplan import Constraint
 import astropy.units as u
-from saltshaker.model import get_model
 import numpy as np
+from astroplan import Constraint, moon_illumination
+
+from saltshaker.model import get_model
+
 
 class SaltTrackLengthConstraint(Constraint):
     """
@@ -56,13 +58,11 @@ class SaltTrackLengthConstraint(Constraint):
             declination = target.dec.to(u.deg).value
             ra = target.ra
 
-            
             # 3. Calculate all hour angles at once (Vectorized)
             ha = (lst - ra).to(u.hourangle).value
             
-            # 4. Normalize HAs to [-12, 12] range (Vectorized)
-            ha[ha > 12] -= 24
-            ha[ha < -12] += 24
+            # 4. Normalize HAs to [-12, 12) range (Vectorized)
+            ha = (ha + 12) % 24 - 12
             
             # 5. Get all track lengths at once (Vectorized call to optimized model)
             track_lens = self.tracking_model.track_length(declination, ha) * u.second
@@ -104,7 +104,6 @@ class SaltMoonConstraint(Constraint):
         else:
             times_arr = times
 
-        from astroplan import moon_illumination
         illum = moon_illumination(times_arr)
         illum_ok = illum <= self.max_illumination
         

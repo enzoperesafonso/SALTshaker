@@ -11,7 +11,9 @@ is only loaded and parsed once per session.
 """
 
 import os
+
 import numpy as np
+
 
 class SaltTrackingModel:
     """
@@ -35,7 +37,7 @@ class SaltTrackingModel:
     def __new__(cls):
         """Implements the singleton pattern for SaltTrackingModel."""
         if cls._instance is None:
-            cls._instance = super(SaltTrackingModel, cls).__new__(cls)
+            cls._instance = super().__new__(cls)
             cls._instance._initialized = False
         return cls._instance
 
@@ -107,19 +109,43 @@ class SaltTrackingModel:
         
         return ha_final, tl_final
 
+    @property
+    def dec_range(self):
+        """The (min, max) declination in degrees covered by the model."""
+        return float(self.declinations[0]), float(self.declinations[-1])
+
     def get_east_track(self, declination):
-        """Calculates the start and end hour angles for the eastern (rising) track."""
-        dec = np.asarray(declination)
-        if np.any(dec < self.declinations[0]) or np.any(dec > self.declinations[-1]):
-            if np.isscalar(declination):
-                raise ValueError(f"Declination {declination} out of range.")
-            # For arrays, we could return NaNs or handle it, but following original logic:
-            dec = np.clip(dec, self.declinations[0], self.declinations[-1])
-            
+        """
+        Calculates the start and end hour angles for the eastern (rising) track.
+
+        Args:
+            declination (float | np.ndarray): Declination(s) in degrees.
+
+        Returns:
+            tuple: ``(start_ha, end_ha)`` in hours. Scalars for a scalar input;
+                arrays for array input, with NaN wherever the declination is
+                outside the model range.
+
+        Raises:
+            ValueError: If a scalar declination is outside the model range.
+        """
+        dec = np.asarray(declination, dtype=float)
+        lo, hi = self.dec_range
+        out_of_range = (dec < lo) | (dec > hi)
+        if dec.ndim == 0:
+            if out_of_range:
+                raise ValueError(
+                    f"Declination {float(dec):.2f} deg is outside SALT's observable "
+                    f"range ({lo:.2f} to {hi:.2f} deg)."
+                )
+            return (float(np.interp(dec, self.declinations, self.e_start)),
+                    float(np.interp(dec, self.declinations, self.e_end)))
+
         s = np.interp(dec, self.declinations, self.e_start)
         e = np.interp(dec, self.declinations, self.e_end)
-        
-        return (float(s), float(e)) if np.isscalar(declination) else (s, e)
+        s[out_of_range] = np.nan
+        e[out_of_range] = np.nan
+        return s, e
 
     def get_west_track(self, declination):
         """Calculates the start and end hour angles for the western (setting) track."""
@@ -152,12 +178,28 @@ class SaltTrackingModel:
     def track_length(self, declination, hour_angle):
         """
         Returns the available track length (in seconds) for a target.
-        Supports scalar or NumPy array inputs for hour_angle.
+
+        Args:
+            declination (float | np.ndarray): Declination(s) in degrees.
+            hour_angle (float | np.ndarray): Hour angle(s) in hours, in
+                [-12, 12]. Broadcast against `declination`.
+
+        Returns:
+            float | np.ndarray: Remaining track length in seconds (0 where the
+                target is not trackable). A float if both inputs are scalar.
         """
-        ha = np.asarray(hour_angle)
-        
+        dec, ha = np.broadcast_arrays(np.asarray(declination, dtype=float),
+                                      np.asarray(hour_angle, dtype=float))
+        out = np.zeros(dec.shape, dtype=float)
+        for d in np.unique(dec):
+            mask = dec == d
+            out[mask] = self._track_length_at_dec(float(d), np.atleast_1d(ha[mask]))
+        return float(out) if out.ndim == 0 else out
+
+    def _track_length_at_dec(self, declination, ha):
+        """Track length for one scalar declination and a 1-D array of hour angles."""
         if declination < self.declinations[0] or declination > self.declinations[-1]:
-            return np.zeros_like(ha, dtype=float) if not np.isscalar(hour_angle) else 0.0
+            return np.zeros_like(ha, dtype=float)
             
         idx = np.searchsorted(self.declinations, declination)
         if idx == 0: idx = 1
@@ -166,8 +208,7 @@ class SaltTrackingModel:
         dec1, dec2 = self.declinations[idx-1], self.declinations[idx]
         
         def get_tl_at_dec(d, ha_in):
-            # Ensure d is a hashable scalar
-            d_key = float(np.asarray(d).item()) if np.asarray(d).size == 1 else float(d)
+            d_key = float(d)
             e_ha, e_tl = self.east_data[d_key]
             w_ha, w_tl = self.west_data[d_key]
             
@@ -179,14 +220,14 @@ class SaltTrackingModel:
             if len(e_ha) > 0:
                 valid_e = (ha_in >= e_ha[0]) & (ha_in <= e_ha[-1]) & east_mask
                 if np.any(valid_e):
-                    res[valid_e] = np.interp(ha_in[valid_e], e_ha, e_tl) if not np.isscalar(ha_in) else np.interp(ha_in, e_ha, e_tl)
+                    res[valid_e] = np.interp(ha_in[valid_e], e_ha, e_tl)
             
             # Logic for West track
             if len(w_ha) > 0:
                 west_mask = (ha_in > 0)
                 valid_w = (ha_in >= w_ha[0]) & (ha_in <= w_ha[-1]) & west_mask
                 if np.any(valid_w):
-                    res[valid_w] = np.interp(ha_in[valid_w], w_ha, w_tl) if not np.isscalar(ha_in) else np.interp(ha_in, w_ha, w_tl)
+                    res[valid_w] = np.interp(ha_in[valid_w], w_ha, w_tl)
             
             return res
 
@@ -206,7 +247,7 @@ class SaltTrackingModel:
         frac = (declination - dec1) / (dec2 - dec1)
         result = tl1 + (tl2 - tl1) * frac
         
-        return result if not np.isscalar(hour_angle) else float(result)
+        return result
 
     def get_max_track_length(self, declination):
         """Calculates the maximum possible track length for a given declination."""

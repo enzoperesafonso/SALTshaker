@@ -1,10 +1,9 @@
-import pytest
+import astropy.units as u
+from astropy.coordinates import SkyCoord
+
 from saltshaker.observer import get_salt_observer
 from saltshaker.planning import get_visibility_windows
-from astropy.coordinates import SkyCoord
-import astropy.units as u
-from astropy.time import Time
-import numpy as np
+
 
 def test_vectorized_visibility_windows():
     """Tests that get_visibility_windows handles multiple targets correctly."""
@@ -33,3 +32,13 @@ def test_vectorized_visibility_windows():
             assert (vector_results[i][j].start_time - scalar_results[i][j].start_time).sec < 1e-3
             # Compare durations
             assert abs(vector_results[i][j].duration - scalar_results[i][j].duration) < 1e-3
+
+
+def test_out_of_range_declinations_have_no_windows():
+    """Regression: array declinations outside the model range were silently clipped."""
+    observer = get_salt_observer()
+    targets = SkyCoord(ra=[10, 10, 10] * u.deg, dec=[-30, 50, -85] * u.deg)
+    results = get_visibility_windows(targets, '2026-01-15', observer=observer)
+    assert len(results[0]) > 0
+    assert results[1] == []
+    assert results[2] == []

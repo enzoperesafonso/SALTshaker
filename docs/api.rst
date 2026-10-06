@@ -20,3 +20,9 @@ API Reference
    :members:
    :undoc-members:
    :show-inheritance:
+
+.. automodule:: saltshaker.plotting
+   :members:
+
+.. automodule:: saltshaker.cli
+   :members:

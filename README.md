@@ -1,7 +1,7 @@
 # saltshaker
 
 <p align="center">
-  <img src="salt_shaker_logo.png" width="500" alt="saltshaker Logo">
+  <img src="https://raw.githubusercontent.com/enzoperesafonso/saltshaker/main/salt_shaker_logo.png" width="500" alt="saltshaker Logo">
 </p>
 
 <p align="center">
@@ -35,6 +35,7 @@ Because SALT operates with a unique fixed-altitude design (pointing permanently 
 *   **Track Lengths:** Determine how long SALT can track a target before it hits the edge of its operational limits.
 *   **Astroplan Integration:** Use SALT-specific tracking and lunar constraints directly within `astroplan` scheduling.
 *   **Semester Planning:** Automatically calculate visibility statistics and nights for entire 6-month SALT observing semesters.
+*   **Screening Tools:** Vectorized array inputs, `visibility_table` for catalogs, a `saltshaker` command line tool and a quick plot helper.
 *   **Singleton Tracking Model:** Efficient data loading and high-performance interpolation.
 
 ## Installation
@@ -48,12 +49,14 @@ pip install saltishaker
 > [!NOTE]
 > Although the package is installed as `saltishaker`, you import it in your code as `saltshaker`.
 
+Optional extras: `pip install "saltishaker[plot]"` (plotting helper) or `"saltishaker[examples]"` (matplotlib + pandas).
+
 For development installation:
 
 ```bash
 git clone https://github.com/enzoperesafonso/saltshaker.git
 cd saltshaker
-pip install .
+pip install -e ".[plot]"
 ```
 
 ## Quick Start
@@ -75,6 +78,14 @@ tracks = observer.get_tracks(target, time)
 
 for track in tracks:
     print(f"Visible from {track.start_time_utc} to {track.end_time_utc}")
+```
+
+A date-only string such as `"2026-01-15"` starts a 24-hour search at 12:00 UTC; a `Time` is used exactly as the start of the window. Windows are purely geometric; pass `night_only=True` to clip them to astronomical night.
+
+Or from the command line:
+
+```bash
+saltshaker visibility Sirius 2026-01-15 --night-only
 ```
 
 ## Documentation

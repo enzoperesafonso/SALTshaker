@@ -23,7 +23,7 @@ Track Length Characteristics
 The track length depends entirely on the target's **declination** and its current **hour angle** (how far it is from the meridian):
 
 1. **Maximum Track Time:** Depending on the declination, the maximum possible track length ranges from about 45 minutes to over 2 hours.
-2. **Declination Limits:** SALT can only observe targets with declinations roughly between **-75° and +10°**.
+2. **Declination Limits:** SALT can only observe targets with declinations roughly between **-76° and +11°**.
 
 East, West, and the Zenith Hole
 -------------------------------

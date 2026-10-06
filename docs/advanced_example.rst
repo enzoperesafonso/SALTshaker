@@ -102,20 +102,20 @@ The output of this script provides a baseline to help guide your observing strat
 
 .. code-block:: text
 
-    Evaluating 5 targets over 214 nights...
+    Evaluating 5 targets over 184 nights...
 
     --- Preliminary Semester 2026-1 Planning Report ---
          Target  Nights Available  Est. Total Hours  Est. Avg Min/Night
-       NGC 1365                48              26.5                33.1
-            M83               103              72.2                42.1
-    Centaurus A               106              89.5                50.7
-        NGC 253                79              44.0                33.4
-           M104                89              82.2                55.4
+       NGC 1365                68              38.2                33.8
+            M83                66              39.8                36.1
+    Centaurus A                68              48.0                42.4
+        NGC 253                97              60.8                37.6
+           M104                53              40.8                46.1
 
 Strategic Benefits
 ------------------
 
 *   **Multivariate Preliminary Check:** This approach accounts for the interaction between dark time, lunar phase, and SALT's physical tracking annulus simultaneously.
-*   **Strategy Guidance:** The report helps identify which targets have limited availability (e.g., NGC 253 in this example), allowing you to focus on them when they are best placed.
+*   **Strategy Guidance:** The report helps identify which targets have limited availability (e.g., M104 in this example), allowing you to focus on them when they are best placed.
 *   **Time Request Justification:** These estimates provide a quantitative basis for the time requests you will ultimately define and validate in the official SALT PIPT.
 *   **Comprehensive Screening:** This example allows you to screen multiple targets across a broad timeframe, identifying the most promising candidates for your project before performing the mandatory final checks in the official tools.

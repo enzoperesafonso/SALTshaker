@@ -18,21 +18,29 @@ classifiers = [
 ]
 dependencies = [
     "astropy>=6.1.1",
-    "scipy>=1.14.0",
     "numpy>=1.26.4",
-    "pandas (>=2.3.3,<3.0.0)",
-    "matplotlib (>=3.10.8,<4.0.0)",
     "astroplan (>=0.10.1,<0.11.0)"
 ]
 
 [project.optional-dependencies]
+plot = [
+    "matplotlib (>=3.10.8,<4.0.0)",
+]
+examples = [
+    "matplotlib (>=3.10.8,<4.0.0)",
+    "pandas (>=2.3.3,<3.0.0)",
+]
 docs = [
     "sphinx",
     "sphinx-rtd-theme",
     "myst-parser",
     "sphinx-autodoc-typehints",
     "matplotlib",
+    "pandas",
 ]
+
+[project.scripts]
+saltshaker = "saltshaker.cli:main"
 
 [project.urls]
 Homepage = "https://saltishaker.readthedocs.io/"
@@ -46,6 +54,13 @@ packages = [{include = "saltshaker", from = "src"}]
 [tool.poetry.group.dev.dependencies]
 pytest = "^9.0.2"
 ruff = "^0.14.10"
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 110
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]

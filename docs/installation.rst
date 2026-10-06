@@ -9,10 +9,7 @@ Requirements
 * ``astropy`` (>=6.1.1)
 * ``astroplan`` (>=0.10.1)
 * ``numpy`` (>=1.26.4)
-* ``scipy`` (>=1.14.0)
-* ``pandas`` (>=2.3.3)
-* ``matplotlib`` (>=3.10.8)
-
+* 
 Standard Installation
 ---------------------
 
@@ -21,6 +18,8 @@ You can install the package via ``pip``:
 .. code-block:: bash
 
     pip install saltishaker
+
+Optional extras: ``saltishaker[plot]`` (matplotlib, for ``saltshaker.plotting``) and ``saltishaker[examples]`` (matplotlib and pandas, used by the documentation examples).
 
 .. note::
     While the package is listed on PyPI as ``saltishaker``, it is imported in Python as ``saltshaker``. All examples in this documentation use the ``saltshaker`` import.
@@ -40,14 +39,14 @@ If you want to contribute to ``saltshaker`` or modify the source code, we recomm
 
    .. code-block:: bash
 
-       git clone https://github.com/enzo-peres-afonso/saltshaker.git
+       git clone https://github.com/enzoperesafonso/saltshaker.git
        cd saltshaker
 
-2. Install dependencies (including development tools like ``pytest``, ``ruff``, and ``sphinx``):
+2. Install dependencies (including development tools like ``pytest`` and ``ruff``, plus plotting and docs extras):
 
    .. code-block:: bash
 
-       poetry install
+       poetry install --with dev --extras "plot docs"
 
 3. Activate the virtual environment:
 
@@ -60,3 +59,9 @@ If you want to contribute to ``saltshaker`` or modify the source code, we recomm
    .. code-block:: bash
 
        pytest
+
+5. (Optional) Build the documentation:
+
+   .. code-block:: bash
+
+       sphinx-build -b html docs docs/_build/html

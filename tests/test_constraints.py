@@ -1,13 +1,15 @@
-import pytest
-from saltshaker import get_salt_observer, SaltTrackLengthConstraint, SaltMoonConstraint
+import astropy.units as u
+import numpy as np
 from astropy.coordinates import SkyCoord
 from astropy.time import Time
-import astropy.units as u
 
-def test_track_length_constraint():
+from saltshaker import SaltMoonConstraint, SaltTrackLengthConstraint, get_salt_observer
+
+
+def test_track_length_constraint(sirius):
     """Tests the SaltTrackLengthConstraint."""
     observer = get_salt_observer()
-    target = SkyCoord.from_name('Sirius')
+    target = sirius
     
     # Sirius transits around 23:30 UT on Jan 15th
     # But SALT has a zenith hole!
@@ -24,10 +26,10 @@ def test_track_length_constraint():
     res = constraint.compute_constraint(time, observer, [target])
     assert res[0][0] == False
 
-def test_moon_constraint():
+def test_moon_constraint(sirius):
     """Tests the SaltMoonConstraint."""
     observer = get_salt_observer()
-    target = SkyCoord.from_name('Sirius')
+    target = sirius
     
     # Jan 15th 2026 is near New Moon (Phase ~ 0.04)
     time = Time('2026-01-15 00:00:00')
@@ -41,14 +43,21 @@ def test_moon_constraint():
     # New Moon is on Jan 18th 2026.
     # So on Jan 15th it's a thin crescent.
     
-    # Now check with Full Moon (approx Jan 4th 2026)
-    time_full = Time('2026-01-04 00:00:00')
-    # 0.1 max illumination should fail (unless Moon is down)
+    # Full Moon (Jan 3-4 2026) rises around sunset, so 18:00 UTC (20:00 local)
+    # is well after moonrise and the Moon is up.
+    time_full = Time('2026-01-03 20:00:00')
+    assert observer.moon_altaz(time_full).alt > 0 * u.deg
     constraint = SaltMoonConstraint(max_illumination=0.1)
-    
-    # We need to make sure the Moon is up to fail.
-    # Check Moon altitude at that time.
-    moon_altaz = observer.moon_altaz(time_full)
-    if moon_altaz.alt > 0:
-        res = constraint.compute_constraint(time_full, observer, [target])
-        assert res[0][0] == False
+    res = constraint.compute_constraint(time_full, observer, [target])
+    assert res[0][0] == False
+
+
+def test_constraints_array_times_and_targets(sirius):
+    """Both constraints accept arrays of times and several targets."""
+    observer = get_salt_observer()
+    targets = [sirius, SkyCoord(ra=10 * u.deg, dec=-40 * u.deg)]
+    times = Time('2026-01-15 12:00:00') + np.arange(0, 24, 2) * u.hour
+    for constraint in (SaltTrackLengthConstraint(min_track_length=600 * u.second),
+                       SaltMoonConstraint(max_illumination=0.5)):
+        res = constraint.compute_constraint(times, observer, targets)
+        assert res.shape == (2, len(times))

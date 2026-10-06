@@ -1,26 +1,28 @@
 import pytest
-from saltshaker import get_semester_start, get_semester_end, get_semester_nights
-from astropy.time import Time
+
+from saltshaker import get_semester_end, get_semester_nights, get_semester_start
+
 
 def test_semester_dates():
     """Tests the start and end dates of SALT semesters."""
-    # Semester 1, 2026
-    s1_start = get_semester_start(2026, 1)
-    s1_end = get_semester_end(2026, 1)
-    assert s1_start.iso == '2026-03-01 12:00:00.000'
-    assert s1_end.iso == '2026-10-01 12:00:00.000'
-    
-    # Semester 2, 2026
-    s2_start = get_semester_start(2026, 2)
-    s2_end = get_semester_end(2026, 2)
-    assert s2_start.iso == '2026-10-01 12:00:00.000'
-    assert s2_end.iso == '2027-03-01 12:00:00.000'
+    # Semester 1 runs May-October, semester 2 November-April.
+    assert get_semester_start(2026, 1).iso == '2026-05-01 12:00:00.000'
+    assert get_semester_end(2026, 1).iso == '2026-11-01 12:00:00.000'
+    assert get_semester_start(2026, 2).iso == '2026-11-01 12:00:00.000'
+    assert get_semester_end(2026, 2).iso == '2027-05-01 12:00:00.000'
+
+
+def test_invalid_semester():
+    with pytest.raises(ValueError):
+        get_semester_start(2026, 3)
+    with pytest.raises(ValueError):
+        get_semester_end(2026, 0)
 
 def test_semester_nights():
     """Tests that we can get a list of nights in a semester."""
     nights = get_semester_nights(2026, 1)
-    # Semester 1 is March to September (approx 214 days)
-    assert 210 <= len(nights) <= 220
+    # Semester 1 is May to October (184 days)
+    assert 182 <= len(nights) <= 184
     
     # Each night should have a start and end
     for night in nights:
@@ -28,4 +30,4 @@ def test_semester_nights():
         assert night[0] < night[1]
         # Duration should be around 10-14 hours
         duration = (night[1] - night[0]).to('hour').value
-        assert 8 < duration < 15
+        assert 7 < duration < 15
